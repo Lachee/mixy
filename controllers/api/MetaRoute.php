@@ -1,8 +1,6 @@
-<?php
-namespace controllers\api;
-use router\Route;
-use db\Query;
-use router\RouteFactory;
+<?php namespace app\controllers\api;
+use kiss\router\Route;
+use kiss\router\RouteFactory;
 
 class MetaRoute extends Route {
 

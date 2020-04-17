@@ -1,7 +1,6 @@
-<?php
-namespace db;
+<?php namespace kiss\db;
 
-use core\models\BaseObject;
+use kiss\models\BaseObject;
 
 class ActiveRecord extends BaseObject{
 

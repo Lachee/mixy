@@ -1,5 +1,4 @@
-<?php
-namespace db;
+<?php namespace kiss\db;
 class ActiveQuery extends Query {
 
     private $className;
