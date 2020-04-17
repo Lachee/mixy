@@ -32,6 +32,11 @@ class BaseObject implements SchemaInterface, JsonSerializable {
     /** Creates a new instance of the class */
     function __construct($properties = [])
     {
+        //If its a function, execute it to get the properties back
+        if (is_callable($properties)) 
+            $properties = call_user_func($properties, $this);
+
+        //Iterate over the properties
         foreach($properties as $key => $pair) {
             if (property_exists($this, $key)) {
 
@@ -63,7 +68,7 @@ class BaseObject implements SchemaInterface, JsonSerializable {
                                 }
 
                                 //Append to the list
-                                $this->{$key}[$i] = self::create($class, $p);
+                                $this->{$key}[$i] = $class == null ? $p : self::create($class, $p);
                             }
                         }
 

@@ -7,6 +7,7 @@ if (!defined('KISS_SESSIONLESS'))
     define('KISS_SESSIONLESS', false);
 
 use Exception;
+use kiss\db\Connection;
 use kiss\helpers\HTTP;
 use kiss\helpers\Response;
 use kiss\models\BaseObject;
@@ -33,18 +34,31 @@ class Kiss extends BaseObject {
     /** @var BaseObject[] collection of components */
     protected $components = [];
 
+    /** @var Connection the database */
+    protected $db = null;
+
     public function __construct($options = []) {
         Kiss::$app = $this;
         parent::__construct($options);
     }
 
     protected function init() {
+        //Prepare the DB
+        if ($this->db != null) {
+            $this->db = new Connection($this->db['dsn'],$this->db['user'],$this->db['pass'], array(), $this->db['prefix']);
+        }
+
         if (KISS_SESSIONLESS) {
             $this->session = null;
         } else {
             $this->initializeObject($this->session);
             $this->session->start();
         }
+    }
+
+    /** @return Connection the current database. */
+    public function db() { 
+        return $this->db;
     }
 
     /** magic get value */
