@@ -28,3 +28,7 @@ $family-sans-serif: "Nunito", sans-serif;
 @import '~bulma/bulma';
 @import 'bulma-switch';
 @import 'bulma-gradients.scss';
+
+.has-background-transparent {
+    background-color: transparent;
+}

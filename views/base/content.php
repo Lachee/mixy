@@ -1,6 +1,7 @@
 
 <?php
 
+use kiss\controllers\Controller;
 use kiss\helpers\HTML;
 use widget\Breadcrumb;
 use widget\Menu;
@@ -30,3 +31,6 @@ use widget\Notification;
         </div>
     </div>
 </body>
+
+
+    

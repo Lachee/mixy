@@ -40,7 +40,7 @@ const MixyConfiguration = {
     module: {
         rules: [
           {
-            test: /\.xs[ac]ss$/i,
+            test: /\.css$/i,
             use: [
                 'style-loader',
                 'css-loader',

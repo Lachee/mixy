@@ -2,33 +2,57 @@
 
 namespace kiss\models;
 
+use kiss\exception\InvalidOperationException;
 use kiss\helpers\HTML;
 
 class Session extends BaseObject {
-
     const KEY_NOTIFICATIONS = '_notifications';
 
-    public $id;
+    protected $id;
 
+    /** Gets the current session ID.
+     * @return string|null the session id, null if there is none available.
+     */
+    public function getId() {
+        return $this->id;
+    }
+
+    /** Gets a session value */
     public function get($key, $default = null) {
         return $_SESSION[$key] ?? $default;
     }
 
+    /** Sets a session key  */
     public function set($key, $value) {
         $_SESSION[$key] = $value;
     }
 
+    /** Checks if a session key is set */
     public function isset($key) {
         return isset($_SESSION[$key]);
     }
 
+    /** starts a session.
+     * @return string session id.
+     */
     public function start() {
-        session_start();
-        $this->id = session_id();
+        if (!session_start())
+            throw new InvalidOperationException();
+        return $this->id = session_id();
     }
 
+    /** stops the current session 
+     * @return string previous session id.
+    */
     public function stop() {
-        session_abort();
+        if (!session_abort())
+            throw new InvalidOperationException();
+        return $this->id;
+    }
+
+    /** Destroys session data entirely */
+    public function abort() {
+        session_destroy();
         $this->id = null;
     }
 

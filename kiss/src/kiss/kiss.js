@@ -3,7 +3,7 @@ import './mobile';
 import './MD5';
 import '../bulma/modal.js';
 
-import(/* webpackChunkName: "fontawesome" */ '@fortawesome/fontawesome-pro/js/regular');
+import(/* webpackChunkName: "fontawesome" */ '@fortawesome/fontawesome-pro/js/all');
 
 export function createSchemaEditor(editorbox, schema, startval = null) {
         

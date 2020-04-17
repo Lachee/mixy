@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 //Define the autoload directory and file
 define('KISS_AUTOLOAD_DIR', __DIR__);

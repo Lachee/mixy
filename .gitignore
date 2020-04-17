@@ -6,7 +6,7 @@ public/dist/*
 build/*
 
 # Files
-config.php
-server.js
+/config.php
+/server.js
 .npmrc
 

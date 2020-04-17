@@ -12,6 +12,10 @@ use kiss\router\Route;
 
 class Controller extends Route {
 
+    public const POS_START = 0;
+    public const POS_END = 1;
+    private $js = [];
+
     public static function getRouting() {
         $class = get_called_class();
 
@@ -37,8 +41,21 @@ class Controller extends Route {
         return $route;
     }
 
+    /** Registers a constant variable to be declared */
+    public function registerJsVariable($name, $value, $position = self::POS_START, $scope = 'const') {
+        $name = str_replace(' ', '_', $name);
+        $this->js[$position]["_$name"] = "{$scope} {$name} = " . json_encode($$value) . ";"; 
+    }
+
+    /** Registers some javascript */
+    public function registerJs($js, $position = self::POS_END, $key = null) {
+        $key = $key ?? md5($js);
+        $this->js[$position][$key] = $js;
+    }
+
     protected $headerFile = "@/views/base/header.php";
     protected $contentFile = "@/views/base/content.php";
+    protected $footerFile = "@/views/base/footer.php";
     protected $exceptionView = '@/views/base/error';
 
     /** Renders an exception */
@@ -54,6 +71,7 @@ class Controller extends Route {
         $html = '';
         if (!empty($this->headerFile)) $html .= $this->renderFile($this->headerFile, $options);
         if (!empty($this->contentFile)) $html .= $this->renderFile($this->contentFile, $options); else $html .= $options['_VIEW'];
+        if (!empty($this->footerFile)) $html .= $this->renderFile($this->footerFile, $options);
         return $html;
     }
 
@@ -82,6 +100,17 @@ class Controller extends Route {
         $options['_CONTROLLER'] = $this;
         $filepath = (strpos($action, "@") === 0 ? $action : "@/views" . $path . "/" . $action) . ".php";
         return $this->renderFile($filepath, $options);
+    }
+
+    /** Renders all the current js variables */
+    private function renderJsVariables($position) {
+        if (!isset($this->js[$position])) return '';
+
+        $lines = [];
+        foreach($this->js[$position] as $name => $def)
+            $lines[] = $def;
+
+        return '<script>' . join("\n", $lines) . '</script>';
     }
 
     protected function setHeaderTemplate($file) { $this->headerFile = $file; return $this; }

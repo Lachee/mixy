@@ -1,6 +1,7 @@
 <?php
 
 use kiss\helpers\HTML;
+use kiss\Kiss;
 
 ?>
 <!-- START NAV -->
@@ -21,6 +22,25 @@ use kiss\helpers\HTML;
                 <a class="navbar-item" href="<?= HTML::href('/editor/100/')?>">Editor</a>
                 <!--<a class="navbar-item" href="admin.html">Exceptions</a>-->
                 <a class="navbar-item" href="<?= HTML::href('/manager/')?>">Services</a>
+            </div>
+        </div>
+        <div id="navMenu" class="navbar-end">
+            <div class="navbar-start">
+                <div class="navbar-item">
+                    <p class="control">
+                        <?php if (($user = Kiss::$app->mixer->debugGetUser()) != null): ?>
+                            <a class="button" href="https://mixer.com/<?= HTML::encode($user->channel['token']); ?>" >
+                                <span class="icon"><i class="fab fa-mixer"></i></span>
+                                <span><?= $user->username ?></span>
+                            </a>
+                        <?php else: ?>
+                            <a class="button" onclick="mixy.mixerLogin(() => location.reload());">
+                                <span class="icon"><i class="fab fa-mixer"></i></span>
+                                <span>Login</span>
+                            </a>
+                        <?php endif; ?>
+                    </p>
+                </div>
             </div>
         </div>
     </div>

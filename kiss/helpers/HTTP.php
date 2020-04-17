@@ -204,7 +204,7 @@ class HTTP {
     }
 
     /** The json supplied in the request body, as an associative array. */
-    public static function json() {
-        return json_decode(self::body(), true);
+    public static function json($assoc = true) {
+        return json_decode(self::body(), $assoc);
     }
 }

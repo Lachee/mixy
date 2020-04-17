@@ -85,7 +85,7 @@ class RouteFactory {
             $glob = glob($directory . $filter);
             foreach ($glob as $filename)
             {
-                if (@include $filename) {
+                if (@include_once $filename) {
                     $files[] = $filename;
                 }
             }

@@ -81,7 +81,7 @@ class BaseObject implements SchemaInterface, JsonSerializable {
                         }
 
                         //Create obj
-                        $this->{$key} = self::create($class, $pair);
+                        $this->{$key} = $class == null ? $pair : self::create($class, $pair);
                     }
                 }
             }

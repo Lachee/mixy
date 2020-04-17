@@ -1,4 +1,6 @@
 <?php
+
+use kiss\controllers\Controller;
 use kiss\helpers\HTML;
 use kiss\helpers\HTTP;
 use kiss\Kiss;
@@ -28,9 +30,13 @@ $theme = HTTP::get('theme', 'lumen');
     <!-- JSON Form -->
     <script src="https://cdn.jsdelivr.net/npm/@json-editor/json-editor@latest/dist/jsoneditor.min.js"></script>
 
+    <!-- JS Variables -->
+    <?= $this->renderJsVariables(Controller::POS_START); ?>
+
     <!-- Webpacks -->
     <script src="/dist/kiss.js"></script>
     <link rel="stylesheet" href="/dist/kiss.css">
     <script src="/dist/app.js"></script>
     <link rel="stylesheet" href="/dist/app.css">
+    <script src="/dist/mixy.js"></script>
 </head>

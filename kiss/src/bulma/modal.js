@@ -1,3 +1,30 @@
+document.createModal = function(content, options = {}) {
+	let modal = document.createElement('div');
+	modal.classList.add(options.class || 'modal');
+	modal.show 		= () => document.showModal(modal);
+	modal.hide 		= () => document.hideModal(modal);
+	modal.delete 	= () => document.removeModal(modal);
+	document.querySelector('body').appendChild(modal);
+
+	let boxclass = options.boxClass || 'box';
+	let close = options.showClose === false ? '' : '<button class="modal-close is-large" aria-label="close"></button>';
+
+	modal.innerHTML = `
+	<div class="modal-background"></div>
+	<div class="modal-content">
+		<div class="${boxclass}">
+			${content}
+		</div>
+	${close}
+	`;
+
+	if (options.showClose !== false)
+		modal.querySelector('button.modal-close').addEventListener('click', () => modal.delete());
+
+	modal.show();
+	return modal;
+}
+
 document.showModal = function(modal)
 {
     if (!modal.classList.contains("modal"))
