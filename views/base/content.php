@@ -9,29 +9,24 @@ use widget\Notification;
 ?>
 
 <body>
-
-<?= $this->renderContent('@/views/base/navigation') ?>
-
-<div class="container">        
-    <div class="columns"> 
-        <?php if (Breadcrumb::count() > 0): ?>
-                <div class="column is-3 ">
-                    <?= Menu::widget(); ?>
-                </div>
-
-                <div class="column is-9">
-                    <?= Breadcrumb::widget(); ?>
+    <?= $this->renderContent('@/views/base/navigation') ?>
+    <div class="container">        
+        <div class="columns"> 
+            <?php if (Breadcrumb::count() > 0): ?>
+                    <div class="column is-3 ">
+                        <?= Menu::widget(); ?>
+                    </div>
+                    <div class="column is-9">
+                        <?= Breadcrumb::widget(); ?>
+                        <?= Notification::widget(); ?>
+                        <?= $_VIEW; ?>
+                    </div>
+            <?php else: ?>
+                <div class="column is-12">
                     <?= Notification::widget(); ?>
                     <?= $_VIEW; ?>
                 </div>
-        <?php else: ?>
-            <div class="column is-12">
-                <?= Notification::widget(); ?>
-                <?= $_VIEW; ?>
-            </div>
-        <?php endif;?>
+            <?php endif;?>
+        </div>
     </div>
-</div>
-
-<script async type="text/javascript" src="js/bulma.js"></script>
 </body>
