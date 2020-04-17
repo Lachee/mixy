@@ -1,12 +1,24 @@
 
 # Build Folders
+vendor
 vendor/*
 node_modules/*
+node_modules
 public/dist/*
+public/dist
 build/*
+build
 
 # Files
 config.php
 server.js
 .npmrc
 
+# Kiss Template
+views/*
+!views/base/*
+widget/*
+Mixy.php
+controllers/*
+models/*
+public/images/*
