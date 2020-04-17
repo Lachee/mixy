@@ -6,6 +6,8 @@ if (!defined("XVE_DEBUG")) define("XVE_DEBUG", false);
 
 use kiss\exception\HttpException;
 use kiss\helpers\HTTP;
+use kiss\helpers\StringHelper;
+use kiss\Kiss;
 use kiss\router\Route;
 
 class Controller extends Route {
@@ -71,7 +73,7 @@ class Controller extends Route {
         for ($i = 2; $i < $count; $i++) {
             if (empty($parts[$i])) continue;
             $lwr = strtolower($parts[$i]);
-            if (!startsWith($lwr, ':'))  $path .= '/' . $lwr;
+            if (!StringHelper::startsWith($lwr, ':'))  $path .= '/' . $lwr;
         }
         
         if (empty($path))
@@ -88,7 +90,7 @@ class Controller extends Route {
     /** Renders a single file */
     private function renderFile($file, $_params_ = array()) {
         if (strpos($file, '@') === 0) {
-            $file = \App::$xve->baseDir() . substr($file, 1);
+            $file = Kiss::$app->baseDir() . substr($file, 1);
         }
 
         $_obInitialLevel_ = ob_get_level();
@@ -134,7 +136,7 @@ class Controller extends Route {
 
         //Perform the action
         $response = $this->{$action}();
-        return \App::$xve->respond($response);
+        return Kiss::$app->respond($response);
     }
 
     /** Gets the action name */

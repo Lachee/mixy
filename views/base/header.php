@@ -1,12 +1,13 @@
 <?php
-use helpers\HTML;
-use helpers\HTTP;
+use kiss\helpers\HTML;
+use kiss\helpers\HTTP;
+use kiss\Kiss;
 
 $theme = HTTP::get('theme', 'lumen');
 ?>
 <head>
     <title><?= HTML::$title ?></title>
-    <base href="<?= \App::$xve->baseURL()?>">
+    <base href="<?= Kiss::$app->baseURL()?>">
     
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">

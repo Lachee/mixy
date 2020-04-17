@@ -1,6 +1,6 @@
 <?php
 
-use helpers\HTML;
+use kiss\helpers\HTML;
 
 ?>
 <!-- START NAV -->

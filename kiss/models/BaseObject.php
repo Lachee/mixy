@@ -87,8 +87,14 @@ class BaseObject implements SchemaInterface, JsonSerializable {
     /** Creates a class */
     public static function create($class, $properties = []) {
         if (!is_subclass_of($class, BaseObject::class)) throw new InvalidOperationException("Cannot create {$class} because its not a BaseObject");
-        $propertes['$parent'] = $this;
         return new $class($properties);
+    }
+
+    /** Checks the object. If it is an array with $class set, it will be created */
+    public static function initializeObject(&$obj) {
+        if (is_subclass_of($obj, BaseObject::class)) return $obj;
+        if (isset($obj['$class'])) return ($obj = self::create($obj['$class'], $obj));
+        return $obj;
     }
 
     /** Loads the data into the object. Different to a regular construction because it bases the load of the schema properties.

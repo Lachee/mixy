@@ -1,15 +1,16 @@
 <?php
 namespace widget;
 
-use App;
-use helpers\HTML;
+use kiss\helpers\HTML;
+use kiss\Kiss;
+use kiss\widget\Widget;
 
 class Notification extends Widget {
 
     
     /** {@inheritdoc} */
     public function begin() {
-        $notifications = App::$xve->session->consumeNotifications();
+        $notifications = Kiss::$app->session->consumeNotifications();
         echo '<section class="notifications content">';
         foreach($notifications as $notification) {
             $content = $notification['content'];

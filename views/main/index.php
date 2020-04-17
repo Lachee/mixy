@@ -1,5 +1,5 @@
 <?php
-use helpers\HTML;
+use kiss\helpers\HTML;
 ?>
 
 <script src="/dist/bundle.emojipicker.js"></script>

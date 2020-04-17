@@ -1,8 +1,8 @@
 <?php
 
-use exception\HttpException;
-use helpers\HTML;
-use helpers\HTTP;
+use kiss\exception\HttpException;
+use kiss\helpers\HTML;
+use kiss\helpers\HTTP;
 
 ?>
 

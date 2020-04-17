@@ -7,15 +7,24 @@ define('KISS_AUTOLOAD_FILE', __FILE__);
 //Register the vendor autoload
 include 'vendor/autoload.php';
 
-//Register the autoloader
+//Register the basic autoloader
 spl_autoload_register(function ($name) 
 { 
-    //$name = substr($name, 4);
-    if ($name == false) return;
-    $map = __DIR__ . "/$name.php";
-    $map = str_replace('\\', '/', $map);
-    if (!@include_once($map)) 
-        throw new Exception("Failed to find {$name} as its file does not exist ({$map}).");
+    if ($name == false) return false;  
+        
+    //Try to find a map based of kiss
+    if (class_exists('\\kiss\\Kiss', false)) {
+
+        //Attempt to trim
+        $base = \kiss\Kiss::$app->getBaseNamespace();
+        if (strpos($name, $base) === 0) {
+            $name = substr($name, strlen($base));            
+        }
+    }
+
+    $file = __DIR__ . "/$name.php";
+    $file = str_replace('\\', '/', $file);
+    return @include_once($file);
 });
 
 //Implement functions for older versions of PHP

@@ -70,28 +70,36 @@ class RouteFactory {
 
     /** Registers the directory of routes. */
     public static function registerDirectory($directory, $filters = "*.php") {
-        $count = 0;
+       
 
         if (!is_array($filters)) 
             $filters = [$filters];
 
+        //List of files
+        $files = [];
+
+        //Go through every filter
         foreach($filters as $filter) {
+
             //Scan the directory and include all the files
-            foreach (glob($directory . $filter) as $filename)
+            $glob = glob($directory . $filter);
+            foreach ($glob as $filename)
             {
-                include $filename;
-                $count++;
+                if (@include $filename) {
+                    $files[] = $filename;
+                }
             }
         }
 
         //Search all the declared classes and register them
+        //TODO: Be smart and only iterate over the files array.
         foreach(get_declared_classes() as $class) {
             if(is_subclass_of($class, Route::class)) 
                 self::register($class);
         }
 
         //Return how many we found.
-        return $count;
+        return count($files);
     }
 
     /**  route will find the appropriate route factory and instiate the route for it. */

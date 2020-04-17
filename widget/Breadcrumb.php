@@ -1,7 +1,8 @@
 <?php
 namespace widget;
 
-use helpers\HTML;
+use kiss\helpers\HTML;
+use kiss\widget\Widget;
 
 class Breadcrumb extends Widget {
 

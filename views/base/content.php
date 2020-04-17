@@ -1,7 +1,7 @@
 
 <?php
 
-use helpers\HTML;
+use kiss\helpers\HTML;
 use widget\Breadcrumb;
 use widget\Menu;
 use widget\Notification;

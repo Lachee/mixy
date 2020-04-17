@@ -3,10 +3,14 @@
 if (!defined('KISS_AUTOLOAD_DIR'))
     define('KISS_AUTOLOAD_DIR', __DIR__ . '/../');
 
+if (!defined('KISS_SESSIONLESS'))
+    define('KISS_SESSIONLESS', false);
+
 use Exception;
 use kiss\helpers\HTTP;
 use kiss\helpers\Response;
 use kiss\models\BaseObject;
+use kiss\models\Session;
 
 /** Base application */
 class Kiss extends BaseObject {
@@ -17,8 +21,13 @@ class Kiss extends BaseObject {
     /** @var string the base URL */
     protected $baseUrl;
 
+    /** @var string the base namespace */
+    protected $baseNamespace = 'app';
+
     /** @var string main controller */
     public $mainController = 'app\\controllers\\MainController';
+
+    public $session = [ '$class' => Session::class ];
 
     public function __construct($options = []) {
         Kiss::$app = $this;
@@ -26,13 +35,24 @@ class Kiss extends BaseObject {
     }
 
     protected function init() {
+        if (KISS_SESSIONLESS) {
+            $this->session = null;
+        } else {
+            $this->initializeObject($this->session);
+            $this->session->start();
+        }
     }
 
     /** @var string default response type */
-    private $defaultResponseType = HTTP::CONTENT_TEXT_HTML;
+    private $defaultResponseType = 'text/html';
 
     /** Gets the current default response type. This can be used to determine how we should respond */
     function getDefaultResponseType() { return $this->defaultResponseType; }
+    /** Sets the current defualt response type. */
+    function setDefaultResponseType($type) { $this->defaultResponseType = $type; return $this; }
+
+    /** Gets teh current base namespace */
+    function getBaseNamespace() { return $this->baseNamespace; }
 
     /** The base directory
      * @return string

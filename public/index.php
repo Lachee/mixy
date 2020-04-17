@@ -31,7 +31,8 @@ if (empty($endpoint))
 
 try {
     //Register all the routes in the specified folder
-    RouteFactory::registerDirectory(Kiss::$app->baseDir() . "/controllers/main/", ["*.php", "**/*.php"]);
+    $basedir = Kiss::$app->baseDir();
+    RouteFactory::registerDirectory($basedir . "/controllers/", ["*.php", "**/*.php"]);
 
     //Get the controller
     $controller = RouteFactory::route($routable);
