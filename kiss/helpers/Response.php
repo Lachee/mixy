@@ -4,6 +4,7 @@ namespace kiss\helpers;
 
 use controllers\main\MainController;
 use \Exception;
+use kiss\controllers\Controller;
 use kiss\exception\HttpException;
 use kiss\Kiss;
 use kiss\models\BaseObject;
@@ -43,8 +44,8 @@ class Response {
             case HTTP::CONTENT_TEXT_HTML:
                 try {
                     //Try to get the controller and execute the actionException on it
-                    $controller = BaseObject::create(Kiss::$app->mainController);
-                    $response = $controller->actionException($exception);
+                    $controller = BaseObject::create(Controller::class);
+                    $response = $controller->renderException($exception);
                     return self::html($exception->getStatus(), $response);
                 } catch(Exception $ex) { 
                     //An error occured, so we ill just use the default plain text handling

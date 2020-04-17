@@ -39,11 +39,11 @@ class Controller extends Route {
 
     protected $headerFile = "@/views/base/header.php";
     protected $contentFile = "@/views/base/content.php";
-    protected $exceptionFile = '@/views/base/error.php';
+    protected $exceptionView = '@/views/base/error';
 
     /** Renders an exception */
     function renderException(HttpException $exception) {
-        return $this->render($this->exceptionFile, [ 'exception' => $exception ]);
+        return $this->render($this->exceptionView, [ 'exception' => $exception ]);
     }
 
     /** Renders the page. */
