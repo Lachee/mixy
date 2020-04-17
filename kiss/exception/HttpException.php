@@ -1,5 +1,5 @@
 <?php
-namespace exception;
+namespace kiss\exception;
 
 use Exception;
 

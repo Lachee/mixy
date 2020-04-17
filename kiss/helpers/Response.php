@@ -1,10 +1,12 @@
 <?php
 
-namespace helpers;
+namespace kiss\helpers;
 
-use App;
-use Exception;
-use exception\HttpException;
+use controllers\main\MainController;
+use \Exception;
+use kiss\exception\HttpException;
+use kiss\Kiss;
+use kiss\models\BaseObject;
 
 class Response {
     
@@ -29,7 +31,7 @@ class Response {
 
     /** Creates a new response to handle the exception. If the supplied mode is null, it will use the server's default. */
     public static function httpException(HttpException $exception, $mode = null) {
-        if ($mode == null) $mode = App::$xve->getDefaultResponseType();
+        if ($mode == null) $mode = Kiss::$app->getDefaultResponseType();
         switch ($mode){
             default:
             case HTTP::CONTENT_TEXT_PLAIN:
@@ -41,7 +43,7 @@ class Response {
             case HTTP::CONTENT_TEXT_HTML:
                 try {
                     //Try to get the controller and execute the actionException on it
-                    $controller = new \controllers\main\MainController();
+                    $controller = BaseObject::create(Kiss::$app->mainController);
                     $response = $controller->actionException($exception);
                     return self::html($exception->getStatus(), $response);
                 } catch(Exception $ex) { 

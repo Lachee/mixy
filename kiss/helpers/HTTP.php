@@ -1,5 +1,5 @@
 <?php
-namespace helpers;
+namespace kiss\helpers;
 class HTTP {
     const CONTINUE = 100;
     const SWITCHING_PROTOCOLS = 101;

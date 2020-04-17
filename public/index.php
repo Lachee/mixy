@@ -1,15 +1,15 @@
 <?php 
 
-if (!defined("XVE_DEBUG"))
-    Define("XVE_DEBUG", true);
+if (!defined("KISS_DEBUG")) Define("KISS_DEBUG", false);
 
 require_once '../autoload.php';
 
-use core\controllers\Controller;
-use exception\HttpException;
-use helpers\HTML;
-use helpers\HTTP;
-use router\RouteFactory;
+use kiss\controllers\Controller;
+use kiss\exception\HttpException;
+use kiss\helpers\HTML;
+use kiss\helpers\HTTP;
+use kiss\Kiss;
+use kiss\router\RouteFactory;
 
 //Update the base URL on the HTML
 HTML::$route = HTTP::route();
@@ -31,7 +31,7 @@ if (empty($endpoint))
 
 try {
     //Register all the routes in the specified folder
-    RouteFactory::registerDirectory(\App::$xve->baseDir() . "/controllers/main/", ["*.php", "**/*.php"]);
+    RouteFactory::registerDirectory(Kiss::$app->baseDir() . "/controllers/main/", ["*.php", "**/*.php"]);
 
     //Get the controller
     $controller = RouteFactory::route($routable);
@@ -46,7 +46,7 @@ try {
     //Attempt to get the event
     return $controller->action($endpoint);
 } catch(HttpException $exception) {
-    return \App::$xve->respond($exception);
+    return Kiss::$app->respond($exception);
 } catch(\Exception $exception) {
-    return \App::$xve->respond(new HttpException(HTTP::INTERNAL_SERVER_ERROR, $exception));
+    return Kiss::$app->respond(new HttpException(HTTP::INTERNAL_SERVER_ERROR, $exception));
 }

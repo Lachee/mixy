@@ -1,5 +1,8 @@
 <?php
-namespace router;
+namespace kiss\router;
+
+use kiss\helpers\StringHelper;
+
 class RouteFactory {
 
     const ARGUMENT_PREFIX = ":";
@@ -29,7 +32,7 @@ class RouteFactory {
         $score = 0;
         for ($i = count($selfSegments) - 1; $i >= 0; $i--) {
             if (trim($selfSegments[$i]) == trim($segments[$i]))             $score += 20;   //We match exactly, bonus points
-            else if (startsWith($selfSegments[$i], self::ARGUMENT_PREFIX))  $score += 1;    //We match in the argument, so some points
+            else if (StringHelper::startsWith($selfSegments[$i], self::ARGUMENT_PREFIX))  $score += 1;    //We match in the argument, so some points
             else return 0;                                                                      //We stopped matching, so abort early.
         }
 
@@ -47,7 +50,7 @@ class RouteFactory {
         $object = new $this->className;
 
         for ($i = 0; $i < count($selfSegments); $i++) {
-            if (startsWith($selfSegments[$i], self::ARGUMENT_PREFIX)) {
+            if (StringHelper::startsWith($selfSegments[$i], self::ARGUMENT_PREFIX)) {
                 $name = substr($selfSegments[$i], 1);
                 $object->{$name} = $segments[$i];
             }

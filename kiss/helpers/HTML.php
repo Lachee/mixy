@@ -1,5 +1,5 @@
 <?php
-namespace helpers;
+namespace kiss\helpers;
 class HTML {
     public static $title = 'XVE';
     public static $route = '';
@@ -41,7 +41,7 @@ class HTML {
             $url = substr($url, 1);
             $mod = 1;
 
-            if (strpos($url, '/') === 0 && endsWith(self::$route, '/'))
+            if (strpos($url, '/') === 0 && StringHelper::endsWith(self::$route, '/'))
                 $mode = 0;
 
             $route = substr(self::$route, 0, strrpos(self::$route, "/") + $mod);

@@ -1,16 +1,17 @@
 <?php
-namespace core\models;
+namespace kiss\models;
 
 use JsonSerializable;
-use xve\schema\ArrayProperty;
-use xve\schema\BooleanProperty;
-use xve\schema\EnumProperty;
-use xve\schema\IntegerProperty;
-use xve\schema\NumberProperty;
-use xve\schema\ObjectProperty;
-use xve\schema\RefProperty;
-use xve\schema\SchemaInterface;
-use xve\schema\StringProperty;
+use kiss\exception\InvalidOperationException;
+use kiss\schema\ArrayProperty;
+use kiss\schema\BooleanProperty;
+use kiss\schema\EnumProperty;
+use kiss\schema\IntegerProperty;
+use kiss\schema\NumberProperty;
+use kiss\schema\ObjectProperty;
+use kiss\schema\RefProperty;
+use kiss\schema\SchemaInterface;
+use kiss\schema\StringProperty;
 
 class BaseObject implements SchemaInterface, JsonSerializable {
     
@@ -23,6 +24,7 @@ class BaseObject implements SchemaInterface, JsonSerializable {
 
     /** Before the load */
     protected function beforeLoad($data) {}
+
     /** After the load */
     protected function afterLoad($data, $success) {}
 
@@ -31,12 +33,62 @@ class BaseObject implements SchemaInterface, JsonSerializable {
     {
         foreach($properties as $key => $pair) {
             if (property_exists($this, $key)) {
+
+                $type = get_called_class()::getPropertyType($key);
+                
+                //Set the value
                 $this->{$key} = $pair;
+
+                if (is_array($pair)) {
+
+                    //It is suppose to be an array
+                    if (is_countable($pair) && isset($pair[0])) {
+
+                        $this->{$key} = [];
+                        for($i = 0; $i < count($pair); $i++) {
+
+                            if ($type == 'string' || $type == 'int' || $type == 'float' || $type == 'double' || $type == 'decimal' || $type == 'single' || $type == 'bool' || $type == 'boolean') {
+
+                                //We are just a static
+                                $this->{$key}[] = $pair[0];
+
+                            } else {
+
+                                //Validate the class
+                                $class = $pair['$class'] ?? $type;
+                                if ($class != $type && !is_subclass_of($class, $type)) {
+                                    throw new InvalidOperationException("{$key}'s class {$class} is not of type {$type}!");
+                                }
+
+                                //Append to the list
+                                $this->{$key}[] = self::create($class, $pair[$i]);
+                            }
+                        }
+
+                    } else {
+                    
+                        //Validate the class
+                        $class = $pair['$class'] ?? $type;
+                        if ($class != $type && !is_subclass_of($class, $type)) {
+                            throw new InvalidOperationException("{$key}'s class {$class} is not of type {$type}!");
+                        }
+
+                        //Create obj
+                        $this->{$key} = self::create($class, $pair);
+                    }
+                }
             }
         }
 
         //Init our properties
         $this->init();
+    }
+
+    /** Creates a class */
+    public static function create($class, $properties = []) {
+        if (!is_subclass_of($class, BaseObject::class)) throw new InvalidOperationException("Cannot create {$class} because its not a BaseObject");
+        $propertes['$parent'] = $this;
+        return new $class($properties);
     }
 
     /** Loads the data into the object. Different to a regular construction because it bases the load of the schema properties.
@@ -202,7 +254,7 @@ class BaseObject implements SchemaInterface, JsonSerializable {
                 }
 
                 if (!method_exists($class, "load")) {
-                    if (is_subclass_of($class, \xve\configuration\Configurable::class) || is_subclass_of($class, BaseObject::class)) {
+                    if (is_subclass_of($class, BaseObject::class)) {
                         $result = new $class($value);
                     } else {
                         $this->addError("{$property} has a invalid RefProperty as the class does not have a load() definition or implement a loadable.");
@@ -265,8 +317,8 @@ class BaseObject implements SchemaInterface, JsonSerializable {
     }
 
     /** Gets the type of the property */
-    public static function getPropertyType($property) {
-        $schema = get_called_class()::getSchemaProperties();
+    public static function getPropertyType($property, $schema = null) {
+        $schema = $schema ?: get_called_class()::getSchemaProperties();
         if (isset($schema[$property])) {
             
             $p = $schema[$property];
@@ -291,6 +343,20 @@ class BaseObject implements SchemaInterface, JsonSerializable {
         }
 
         return null;
+    }
+
+    /** @return array returns the type of Configurable children the object has. */
+    public static function getPropertyTypes() { 
+        $class = get_called_class();
+        $schema = $class::getSchemaProperties();
+        $types = [];
+
+        foreach($schema as $field => $property) {
+            $type = self::getPropertyType($field, $schema);
+            if ($type != null) $types[$field] = $type;
+        }
+
+        return $types;
     }
 
 

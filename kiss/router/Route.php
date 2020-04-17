@@ -1,10 +1,9 @@
 <?php
-namespace router;
+namespace kiss\router;
 
-use exception\HttpException;
-use helpers\HTTP;
+use kiss\models\BaseObject;
 
-class Route {
+class Route extends BaseObject {
     public $segments;
     public static function getRouting() { 
         $class = get_called_class();

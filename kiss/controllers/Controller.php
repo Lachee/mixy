@@ -1,13 +1,13 @@
 <?php
-namespace core\controllers;
+namespace kiss\controllers;
 
 //Little script to verify the DEBUG exists.
 if (!defined("XVE_DEBUG")) define("XVE_DEBUG", false);
 
-use Exception;
-use exception\HttpException;
-use helpers\HTTP;
-use router\Route;
+use kiss\exception\HttpException;
+use kiss\helpers\HTTP;
+use kiss\router\Route;
+
 class Controller extends Route {
 
     public static function getRouting() {
@@ -37,6 +37,12 @@ class Controller extends Route {
 
     protected $headerFile = "@/views/base/header.php";
     protected $contentFile = "@/views/base/content.php";
+    protected $exceptionFile = '@/views/base/error.php';
+
+    /** Renders an exception */
+    function renderException(HttpException $exception) {
+        return $this->render($this->exceptionFile, [ 'exception' => $exception ]);
+    }
 
     /** Renders the page. */
     public function render($action, $options = []) {

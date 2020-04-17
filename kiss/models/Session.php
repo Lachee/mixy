@@ -1,8 +1,8 @@
 <?php
 
-namespace core\models;
+namespace kiss\models;
 
-use helpers\HTML;
+use kiss\helpers\HTML;
 
 class Session extends BaseObject {
 

@@ -1,7 +1,7 @@
 <?php
-namespace widget;
+namespace kiss\widget;
 
-use core\models\BaseObject;
+use kiss\models\BaseObject;
 
 class Widget extends BaseObject {
 
