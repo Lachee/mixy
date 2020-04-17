@@ -1,0 +1,12 @@
+
+# Build Folders
+vendor/*
+node_modules/*
+public/dist/*
+build/*
+
+# Files
+config.php
+server.js
+.npmrc
+

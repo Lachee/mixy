@@ -1,0 +1,19 @@
+{
+  "name": "lachee/mixy",
+  "description": "Mixer Web Platform",
+  "license": "MIT",
+  "require": {
+    "predis/predis": "^1.1",
+    "tedivm/jshrink": "^1.3",
+    "emarref/jwt": "^1.0",
+    "lachee/fontawesome-5-cheatsheet": "@dev"
+  },
+  "scripts": {
+    "post-update-cmd": [
+      "lachee\\fontawesome\\Updater::postUpdate"
+    ],
+    "post-install-cmd": [
+      "lachee\\fontawesome\\Updater::postUpdate"
+    ]
+  }
+}
