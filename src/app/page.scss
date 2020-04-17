@@ -1,6 +1,8 @@
 @charset "utf-8";
+
+$primary: #FF0000;
+
 @import '../../kiss/src/bulma/bulma.scss';
 
 html, body {
-    background: $primary;
 }
