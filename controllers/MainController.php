@@ -1,6 +1,7 @@
 <?php namespace app\controllers;
 
 use kiss\controllers\Controller;
+use kiss\Kiss;
 
 class MainController extends Controller {
 

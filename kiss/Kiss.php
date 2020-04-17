@@ -27,7 +27,11 @@ class Kiss extends BaseObject {
     /** @var string main controller */
     public $mainController = 'app\\controllers\\MainController';
 
+    /** @var Session current session object */
     public $session = [ '$class' => Session::class ];
+
+    /** @var BaseObject[] collection of components */
+    protected $components = [];
 
     public function __construct($options = []) {
         Kiss::$app = $this;
@@ -41,6 +45,13 @@ class Kiss extends BaseObject {
             $this->initializeObject($this->session);
             $this->session->start();
         }
+    }
+
+    /** magic get value */
+    public function __get($name) {
+        if (isset($this->components[$name]))
+            return $this->components[$name];
+        return parent::__get($name);
     }
 
     /** @var string default response type */

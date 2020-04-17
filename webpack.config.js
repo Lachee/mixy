@@ -27,6 +27,41 @@ const AppConfiguration = {
     plugins: [  new MiniCssExtractPlugin({ filename: 'app.css' }),  ]
 };
 
+const MixyConfiguration = {
+    entry: './src/mixy/app.js',
+    output: {
+        filename: 'mixy.js',
+        chunkFilename: 'vendor.[name].js',
+        path: path.resolve(__dirname, 'public/dist'),
+        publicPath: '/dist/',
+        library: 'mixy',
+
+    },
+    module: {
+        rules: [
+          {
+            test: /\.xs[ac]ss$/i,
+            use: [
+                'style-loader',
+                'css-loader',
+                'sass-loader',
+            ],
+        },
+        {
+          test: /\.s[ac]ss$/i,
+          use: [
+            MiniCssExtractPlugin.loader,
+            { loader: 'css-loader' },
+            { loader: 'sass-loader', options: { sourceMap: true } },
+          ]
+        }
+      ]
+    },
+    plugins: [ new MiniCssExtractPlugin({ filename: 'mixy.css' }), ],
+    devtool: 'inline-source-map',
+}
+
 module.exports = [
-    AppConfiguration
-];//.concat(require('./kiss/webpack.config'));
+    AppConfiguration,
+    MixyConfiguration
+].concat(require('./kiss/webpack.config'));

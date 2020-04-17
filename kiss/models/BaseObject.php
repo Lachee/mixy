@@ -3,6 +3,7 @@ namespace kiss\models;
 
 use JsonSerializable;
 use kiss\exception\InvalidOperationException;
+use kiss\helpers\StringHelper;
 use kiss\schema\ArrayProperty;
 use kiss\schema\BooleanProperty;
 use kiss\schema\EnumProperty;
@@ -35,6 +36,7 @@ class BaseObject implements SchemaInterface, JsonSerializable {
             if (property_exists($this, $key)) {
 
                 $type = get_called_class()::getPropertyType($key);
+                if ($type == 'object') $type = BaseObject::class;
                 
                 //Set the value
                 $this->{$key} = $pair;
@@ -42,26 +44,26 @@ class BaseObject implements SchemaInterface, JsonSerializable {
                 if (is_array($pair)) {
 
                     //It is suppose to be an array
-                    if (is_countable($pair) && isset($pair[0])) {
+                    if (is_countable($pair) && (isset($pair[0]) || (isset($pair['$assoc']) && $pair['$assoc'] === true))) {
 
                         $this->{$key} = [];
-                        for($i = 0; $i < count($pair); $i++) {
-
+                        foreach($pair as $i => $p) {
+                            if (StringHelper::startsWith($i, '$')) continue;
                             if ($type == 'string' || $type == 'int' || $type == 'float' || $type == 'double' || $type == 'decimal' || $type == 'single' || $type == 'bool' || $type == 'boolean') {
 
                                 //We are just a static
-                                $this->{$key}[] = $pair[0];
+                                $this->{$key}[$i] = $p;
 
                             } else {
 
                                 //Validate the class
-                                $class = $pair['$class'] ?? $type;
+                                $class = $p['$class'] ?? $type;
                                 if ($class != $type && !is_subclass_of($class, $type)) {
                                     throw new InvalidOperationException("{$key}'s class {$class} is not of type {$type}!");
                                 }
 
                                 //Append to the list
-                                $this->{$key}[] = self::create($class, $pair[$i]);
+                                $this->{$key}[$i] = self::create($class, $p);
                             }
                         }
 
