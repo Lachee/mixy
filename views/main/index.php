@@ -9,6 +9,15 @@ use kiss\helpers\HTML;
             <h2 class="subtitle">
                 I hope you are having a great day!
             </h2>
+
+            <h2>JWT:</h2>
+            <pre><?= $text; ?></pre>
+
+            <h2>Potato:</h2>
+            <pre><?= $value; ?></pre>
+
+
         </div>
+
     </div>
 </section>

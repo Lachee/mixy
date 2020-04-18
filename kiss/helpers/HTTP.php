@@ -129,6 +129,8 @@ class HTTP {
         599 => 'Network connect timeout error', // Unknown
     ];
 
+    /** Private internal cookie cache */
+    private static $SET_COOKIES = [];
 
     /** @return string the status message associated with the code */
     public static function status($code) {
@@ -197,6 +199,30 @@ class HTTP {
     /** Gets all the headers */
     public static function headers() { return getallheaders(); }
 
+    /** Gets a cookie value, either from the cookie header or the stored internal cookie cache */
+    public static function cookie($variable, $default = null, $includeResponseCookies = true) {
+        if ($includeResponseCookies && isset(self::$SET_COOKIES[$variable]))
+            return self::$SET_COOKIES[$variable][0];
+        return $_COOKIE[$variable] ?? $default;
+    }
+
+    /** Sets the HTTP cookie headers in response. */
+    public static function setCookie(string $name, string $value = "", int $expires = 0, string $path = "", string $domain = "", bool $secure = false, bool $httponly = false) {
+        self::$SET_COOKIES[$name] = [
+            $value,
+            $expires,
+            $path,
+            $domain,
+            $secure,
+            $httponly
+        ];
+    }
+
+    /** Applys all the cookies that need to be set using the setcookie function. */
+    public static function applyCookies() {
+        foreach(self::$SET_COOKIES as $name => $args)
+            setcookie($name, ...$args); //this operator is called the "splat operator". It unpacks the arguments.
+    }
 
     /** The body supplied with the request */
     public static function body() {

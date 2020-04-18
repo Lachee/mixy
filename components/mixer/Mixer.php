@@ -51,7 +51,7 @@ class Mixer extends BaseObject {
 
         $json = json_decode($response->getBody()->getContents(), true);
         $json['mixer'] = $this;
-        return BaseObject::create(MixerShortCode::class, $json);
+        return BaseObject::new(MixerShortCode::class, $json);
     }
 
     /** Creates a new oauth user with the access tokens */
@@ -66,7 +66,7 @@ class Mixer extends BaseObject {
         $json = json_decode($response->getBody()->getContents(), true);
         $json['mixer'] = $this;
         $json['tokens'] = $tokens;
-        return BaseObject::create(MixerUser::class, $json);
+        return BaseObject::new(MixerUser::class, $json);
     }
 
     public function debugGetUser() { 

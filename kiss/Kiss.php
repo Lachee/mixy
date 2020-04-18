@@ -11,7 +11,10 @@ use kiss\db\Connection;
 use kiss\helpers\HTTP;
 use kiss\helpers\Response;
 use kiss\models\BaseObject;
-use kiss\models\Session;
+use kiss\models\JWTProvider;
+use kiss\schema\RefProperty;
+use kiss\session\Session;
+use kiss\session\PhpSession;
 
 /** Base application */
 class Kiss extends BaseObject {
@@ -28,17 +31,35 @@ class Kiss extends BaseObject {
     /** @var string main controller */
     public $mainController = 'app\\controllers\\MainController';
 
-    /** @var Session current session object */
-    public $session = [ '$class' => Session::class ];
+    /** @var ICache the current cache */
+    protected $cache = null;
+
+    /** Node Provider for uuids. */
+    public $uuidNodeProvider =  null;
+
+    /** @var Connection the database */
+    protected $db = null;
+    
+    /** @var string default response type */
+    private $defaultResponseType = 'text/html';
+
 
     /** @var BaseObject[] collection of components */
     protected $components = [];
 
-    /** @var Connection the database */
-    protected $db = null;
+    /** @var JWTProvider the JWT provider. */
+    public $jwtProvider = [ '$class' => JWTProvider::class ];
 
-    /** @var ICache the current cache */
-    protected $cache = null;
+    /** @var Session current session object */
+    public $session = [ '$class' => PhpSession::class ];
+
+
+    /** {@inheritdoc} */
+    public static function getSchemaProperties($options = []) {
+        return array_merge(parent::getSchemaProperties($options), [
+            'jwtProvider' => new RefProperty(JWTProvider::class)
+        ]);
+    }
 
     public function __construct($options = []) {
         Kiss::$app = $this;
@@ -46,10 +67,13 @@ class Kiss extends BaseObject {
     }
 
     protected function init() {
+        if ($this->uuidNodeProvider == null)
+            $this->uuidNodeProvider = new \Ramsey\Uuid\Provider\Node\RandomNodeProvider();
+        
         //Prepare the DB
-        if ($this->db != null) {
+        if ($this->db != null) 
             $this->db = new Connection($this->db['dsn'],$this->db['user'],$this->db['pass'], array(), $this->db['prefix']);
-        }
+        
 
         if (KISS_SESSIONLESS) {
             $this->session = null;
@@ -58,7 +82,7 @@ class Kiss extends BaseObject {
             $this->session->start();
         }
     }
-
+    
     /** @return Connection the current database. */
     public function db() { 
         return $this->db;
@@ -75,9 +99,6 @@ class Kiss extends BaseObject {
             return $this->components[$name];
         return parent::__get($name);
     }
-
-    /** @var string default response type */
-    private $defaultResponseType = 'text/html';
 
     /** Gets the current default response type. This can be used to determine how we should respond */
     function getDefaultResponseType() { return $this->defaultResponseType; }
@@ -127,14 +148,16 @@ class Kiss extends BaseObject {
 
         }
 
+        //SEt the session cookie
+        if ($this->session) {
+            setcookie(Session::JWT_COOKIE_NAME, $this->session->getJWT(), $this->session->getTokens()->exp);
+        }
+
         //Return the response
         $response->respond();
+        exit;
     }
 
-    /** Creates an object, alias of BaseObject::create */
-    public static function create($class, $properties = []) {
-        return BaseObject::create($class, $properties);
-    }
 }
 
 //Setup an Alias of 'K'

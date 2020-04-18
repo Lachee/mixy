@@ -1,5 +1,6 @@
 <?php namespace kiss\db;
 
+use kiss\Kiss;
 use kiss\models\BaseObject;
 
 class ActiveRecord extends BaseObject{
@@ -23,7 +24,6 @@ class ActiveRecord extends BaseObject{
 
     /** Before the save */
     protected function beforeSave() {}
-
     /** After the save */
     protected function afterSave() {}
 
@@ -61,7 +61,7 @@ class ActiveRecord extends BaseObject{
         $tableKeys = self::tableKey();
 
         //Prepare the query
-        $query = \App::$xve->db()->createQuery()->select(self::tableName())->limit(1);
+        $query = Kiss::$app->db()->createQuery()->select(self::tableName())->limit(1);
 
         //Add the table keys as the where condition
         if (is_string($tableKeys)) {
@@ -109,7 +109,7 @@ class ActiveRecord extends BaseObject{
         $table = $class::tableName();
 
         //Prepare the query and execute
-        $query = \App::$xve->db()->createQuery()->insertOrUpdate($values, $table);
+        $query = Kiss::$app->db()->createQuery()->insertOrUpdate($values, $table);
         
         //Execute the query, returning false if it didn't work
         $result = $query->execute();
@@ -163,7 +163,7 @@ class ActiveRecord extends BaseObject{
      * @return ActiveQuery
     */
     public static function find() {
-        return new ActiveQuery(\App::$xve->db(), get_called_class());
+        return new ActiveQuery(Kiss::$app->db(), get_called_class());
     }
 
     /** Finds the query by keys.

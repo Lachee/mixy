@@ -92,15 +92,15 @@ class BaseObject implements SchemaInterface, JsonSerializable {
     }
 
     /** Creates a class */
-    public static function create($class, $properties = []) {
+    public static function createObject($class, $properties = []) {
         if (!is_subclass_of($class, BaseObject::class)) throw new InvalidOperationException("Cannot create {$class} because its not a BaseObject");
         return new $class($properties);
     }
 
     /** Checks the object. If it is an array with $class set, it will be created */
-    public static function initializeObject(&$obj) {
+    public static function new(&$obj) {
         if (is_subclass_of($obj, BaseObject::class)) return $obj;
-        if (isset($obj['$class'])) return ($obj = self::create($obj['$class'], $obj));
+        if (isset($obj['$class'])) return ($obj = self::new($obj['$class'], $obj));
         return $obj;
     }
 

@@ -11,8 +11,8 @@ class ActiveQuery extends Query {
     }
 
     /** Fetches a single record 
-     * @param $assoc Should associative arrays be returned instead? 
-     * @param $extractScalar Should scalar values be removed from their object?
+     * @param bool $assoc Should associative arrays be returned instead? 
+     * @param bool $extractScalar Should scalar values be removed from their object? Useful for just quering a single entry value (for example, getting username from a record id).
      * @return ActiveRecord|null|false the records
     */
     public function one($assoc = false, $extractScalar = false) {

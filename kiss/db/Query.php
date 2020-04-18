@@ -114,7 +114,7 @@ class Query {
     }
 
     /** Where condition. 
-     * @param array[] $params parameters. eg: [ [ key, value ], [ key, op, value ] ]
+     * @param array[] $params parameters. eg: [ [ key, value ], [ key, op, value ] ], [ key, value ]
      * @param string $method operator, ie and.
      * @return Query
     */

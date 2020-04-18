@@ -10,6 +10,7 @@ $(document).ready(() => {
     $('#login-button').click(async () => {
         $('#login-button').addClass('is-loading');
         await mixy.mixerLogin();
-        location.reload();
+        //location.reload();
+        
     });
 });

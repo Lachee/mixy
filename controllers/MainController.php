@@ -12,14 +12,17 @@ use kiss\Kiss;
 class MainController extends MixyController {
     public static function getRouting() { return "/main"; }
 
-    function actionLogout() {
-        Kiss::$app->session->abort();
+    function actionTest() {
+        $potato = Kiss::$app->session->get('potato', 'potato');
+        Kiss::$app->session->set('potato', $potato . ' x potato');
         return Response::redirect('index');
     }
 
     function actionIndex() {
+        $val =  Kiss::$app->session->get('potato', 'no potato');
         return $this->render('index', [
-            'title' => 'Truthy? '
+            'text' => Kiss::$app->session->getJWT(),
+            'value' => $val
         ]);
     }
 
@@ -34,16 +37,17 @@ class MainController extends MixyController {
         $user = User::findByEmail($mixerUser->email)->one();
         if ($user == null) {
             //Create a new user. Welcome
-            $user = BaseObject::create(User::class, [ 'email' => $mixerUser->email ]);
+            $user = BaseObject::new(User::class, [ 'email' => $mixerUser->email ]);
             Kiss::$app->session->addNotification('Your account has been created!');
         }
 
         //Update exiting values
         $user->updateFromMixerUser($mixerUser);
         $user->login();
+        $success = $user->save();
 
         //return the result of the save
-        return Response::json(HTTP::OK, $user->save());
+        return Response::json(HTTP::OK, $success);
     }
 
     function actionAuthoridddze() {

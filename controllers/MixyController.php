@@ -5,6 +5,13 @@ use kiss\Kiss;
 
 class MixyController extends Controller {
 
+    public function action($endpoint) {
+        
+        
+
+        return parent::action($endpoint);
+    }
+
     public function render($action, $options = []) {
         $mixyDefaults = [
             'clientId'  => Kiss::$app->mixer->clientId,
@@ -12,6 +19,6 @@ class MixyController extends Controller {
         ];
 
         $this->registerJs("mixy.configureOAuth(" . json_encode($mixyDefaults) . ");");
-        return parent::render($action, $options = []);
+        return parent::render($action, $options);
     }
 }

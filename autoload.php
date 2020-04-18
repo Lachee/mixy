@@ -42,4 +42,4 @@ include 'config.php';
 if (empty($config)) { $config = []; }
 
 Global $kiss;
-$kiss = new \kiss\Kiss($config);
+$kiss = \kiss\models\BaseObject::new($config)

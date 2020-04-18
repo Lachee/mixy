@@ -44,7 +44,7 @@ class Response {
             case HTTP::CONTENT_TEXT_HTML:
                 try {
                     //Try to get the controller and execute the actionException on it
-                    $controller = BaseObject::create(Controller::class);
+                    $controller = BaseObject::new(Controller::class);
                     $response = $controller->renderException($exception);
                     return self::html($exception->getStatus(), $response);
                 } catch(Exception $ex) { 
@@ -114,6 +114,9 @@ class Response {
 
     /** Executes the response, setting the current page's response code & headers, echoing out the contents and then exiting. */
     public function respond() {
+        
+        //Cookies
+        HTTP::applyCookies();
 
         //Set the status code
         http_response_code($this->status);
