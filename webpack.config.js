@@ -15,7 +15,7 @@ const AppConfiguration = {
     module: {
         rules: [
         {
-          test: /\.s[ac]ss$/i,
+          test: /\.s?[ac]ss$/i,
           use: [
             MiniCssExtractPlugin.loader,
             { loader: 'css-loader' },
@@ -24,11 +24,14 @@ const AppConfiguration = {
         }
       ]
     },
-    plugins: [  new MiniCssExtractPlugin({ filename: 'app.css' }),  ]
+    plugins: [  new MiniCssExtractPlugin({ filename: 'app.css' }),  ],
+    externals: {
+      'mixy/app': 'mixy'
+    }
 };
 
 const MixyConfiguration = {
-    entry: './src/mixy/app.js',
+    entry: './src/mixy/mixy.js',
     output: {
         filename: 'mixy.js',
         chunkFilename: 'vendor.[name].js',

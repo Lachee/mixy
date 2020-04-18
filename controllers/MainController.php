@@ -1,10 +1,12 @@
 <?php namespace app\controllers;
 
-use app\components\Mixer;
-use kiss\controllers\Controller;
+use app\components\mixer\Mixer;
+
 use kiss\exception\HttpException;
 use kiss\helpers\HTTP;
 use kiss\helpers\Response;
+use kiss\models\BaseObject;
+use app\models\User;
 use kiss\Kiss;
 
 class MainController extends MixyController {
@@ -24,11 +26,24 @@ class MainController extends MixyController {
     /** Authorizes a token */
     function actionAuth() {
         $request = HTTP::json();
-        $user = Kiss::$app->mixer->requestCurrentUser($request['data']);
-        if ($user === null) throw new HttpException(HTTP::BAD_REQUEST, 'invalid tokens');
+        $mixerUser = Kiss::$app->mixer->requestCurrentUser($request['data']);
+        if ($mixerUser === null || empty($mixerUser->email)) throw new HttpException(HTTP::BAD_REQUEST, 'invalid tokens');
 
-        Kiss::$app->session->set('mixer_tokens', $user->tokens);
-        return Response::json(HTTP::OK, 'accepted');
+        //Find a user identity with the matching email
+        /** @var User */
+        $user = User::findByEmail($mixerUser->email)->one();
+        if ($user == null) {
+            //Create a new user. Welcome
+            $user = BaseObject::create(User::class, [ 'email' => $mixerUser->email ]);
+            Kiss::$app->session->addNotification('Your account has been created!');
+        }
+
+        //Update exiting values
+        $user->updateFromMixerUser($mixerUser);
+        $user->login();
+
+        //return the result of the save
+        return Response::json(HTTP::OK, $user->save());
     }
 
     function actionAuthoridddze() {

@@ -1,7 +1,7 @@
 <?php
 namespace kiss\helpers;
 class HTML {
-    public static $title = 'XVE';
+    public static $title = 'KISS Dev';
     public static $route = '';
 
     /** Prepares a URL with special prefix:

@@ -29,12 +29,12 @@ use kiss\Kiss;
                 <div class="navbar-item">
                     <p class="control">
                         <?php if (($user = Kiss::$app->mixer->debugGetUser()) != null): ?>
-                            <a class="button" href="https://mixer.com/<?= HTML::encode($user->channel['token']); ?>" >
+                            <a class="button" id="login-button" href="https://mixer.com/<?= HTML::encode($user->channel['token']); ?>" >
                                 <span class="icon"><i class="fab fa-mixer"></i></span>
                                 <span><?= $user->username ?></span>
                             </a>
                         <?php else: ?>
-                            <a class="button" onclick="mixy.mixerLogin(() => location.reload());">
+                            <a class="button" id="login-button">
                                 <span class="icon"><i class="fab fa-mixer"></i></span>
                                 <span>Login</span>
                             </a>

@@ -1,7 +1,7 @@
 import './mixy.css';
 import './oAuthPopup.js';
 
-import { ShortCodeExpireError, OAuthClient }  from '@mixer/shortcode-oauth';
+import { ShortCodeExpireError, ShortCodeAccessDeniedError, OAuthClient }  from '@mixer/shortcode-oauth';
 
 /** OAuthClient used by the shortcode */
 let mixerOAuthClient = null;
@@ -13,48 +13,56 @@ export function configureOAuth(options) {
 }
 
 /** Attempts to perform a login */
-export function mixerLogin(callback = null) {
+export async function mixerLogin() {
+
+    let modal = getShortCodeModal();
+    modal.show();
 
     const attempt = async function() {
         try 
         {
             //Wait for the code
-            let modal = getShortCodeModal();
-            modal.show();
-
             let shortCode = await mixerOAuthClient.getCode();
-
-            //Update the code and wait for a response
             modal.code(shortCode.code);
             modal.openWindow();
-            let tokens = await shortCode.waitForAccept();
 
-            //Hide the modal
-            modal.hide();
-            modal.closeWindow();
+            //Wait for the tokens
+            let tokens = await shortCode.waitForAccept();
             return tokens;
         } 
         catch(error) 
         {
             if (error instanceof ShortCodeExpireError)
                 return await attempt();
-                
+            
+            if (error instanceof ShortCodeAccessDeniedError)
+                return false;
+
             throw error;
         }
     };
 
-    //Attempt it!
-    attempt().then(tokens => {
-        fetch('/auth', {
+    //Attempt to fetch the tokens
+    let tokens = await attempt();
+
+    //Close the modal windows
+    modal.hide(); 
+    modal.closeWindow();
+
+    if (tokens) {
+
+        //Store the tokens
+        await fetch('/auth', {
             method: 'POST',
             credentials: 'include',
             headers: { 'content-type': 'application/json' },
             body: JSON.stringify(tokens),
-        }).then(data => {
-            console.log(data);
-            if (callback) callback();
         });
-    });
+
+        //Return 
+        return true;
+}
+    return false;
 }
 
 function getShortCodeModal() {

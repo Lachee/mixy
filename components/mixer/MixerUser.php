@@ -1,6 +1,7 @@
-<?php namespace app\components;
+<?php namespace app\components\mixer;
 
 use kiss\models\BaseObject;
+use kiss\schema\RefProperty;
 
 class MixerUser extends BaseObject {
     /** @var Mixer mixer instance */ 
@@ -24,4 +25,10 @@ class MixerUser extends BaseObject {
     public $channel;
     public $twoFactor;
 
+    /** {@inheritdoc} */
+    public static function getSchemaProperties($options = []) {
+        $schema = parent::getSchemaProperties($options);
+        $schema['channel'] = new RefProperty(MixerChannel::class);
+        return $schema;
+    }
 }

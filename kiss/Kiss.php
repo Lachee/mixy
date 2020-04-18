@@ -37,6 +37,9 @@ class Kiss extends BaseObject {
     /** @var Connection the database */
     protected $db = null;
 
+    /** @var ICache the current cache */
+    protected $cache = null;
+
     public function __construct($options = []) {
         Kiss::$app = $this;
         parent::__construct($options);
@@ -59,6 +62,11 @@ class Kiss extends BaseObject {
     /** @return Connection the current database. */
     public function db() { 
         return $this->db;
+    }
+
+    /** @return ICache the current cache. */
+    public function cache() {
+        return $this->cache;
     }
 
     /** magic get value */

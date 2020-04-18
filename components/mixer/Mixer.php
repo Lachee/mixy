@@ -1,4 +1,4 @@
-<?php namespace app\components;
+<?php namespace app\components\mixer;
 
 use kiss\models\BaseObject;
 use GuzzleHttp\HandlerStack;
