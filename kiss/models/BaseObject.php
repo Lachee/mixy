@@ -68,7 +68,7 @@ class BaseObject implements SchemaInterface, JsonSerializable {
                                 }
 
                                 //Append to the list
-                                $this->{$key}[$i] = $class == null ? $p : self::create($class, $p);
+                                $this->{$key}[$i] = $class == null ? $p : self::new($class, $p);
                             }
                         }
 
@@ -81,7 +81,7 @@ class BaseObject implements SchemaInterface, JsonSerializable {
                         }
 
                         //Create obj
-                        $this->{$key} = $class == null ? $pair : self::create($class, $pair);
+                        $this->{$key} = $class == null ? $pair : self::new($class, $pair);
                     }
                 }
             }
@@ -91,16 +91,45 @@ class BaseObject implements SchemaInterface, JsonSerializable {
         $this->init();
     }
 
-    /** Creates a class */
-    public static function createObject($class, $properties = []) {
-        if (!is_subclass_of($class, BaseObject::class)) throw new InvalidOperationException("Cannot create {$class} because its not a BaseObject");
+    /** Creates an object of the class.
+     * If the properties has a $class, then it will validate that it extends it
+    */
+    public static function new($class, $properties = []) {
+        
+        //Evalulate the proeprties
+        if (is_callable($properties)) 
+            $properties = call_user_func($properties);
+        
+        //Get the class and check it
+        $subclass = $properties['$class'] ?? $class;
+        if ($class != $subclass && !is_subclass_of($class, BaseObject::class)) 
+            throw new InvalidOperationException("Cannot create {$subclass} because its not a {$class}");
+
+        //Set the class and return the new object
+        $properties['$class'] = $subclass;
+        return self::newObject($properties);
+    }
+
+    /** Creates a class, tries to get the class from the properties */
+    public static function newObject($properties) {
+        
+        //Evaluate the properties
+        if (is_callable($properties)) 
+            $properties = call_user_func($properties);
+
+        //Get the class and check it
+        $class = $properties['$class'] ?? BaseObject::class;
+        if ($class != BaseObject::class && !is_subclass_of($class, BaseObject::class)) 
+            throw new InvalidOperationException("Cannot create {$class} because its not a BaseObject");
+
+        //Create a new object with the class
         return new $class($properties);
     }
 
     /** Checks the object. If it is an array with $class set, it will be created */
-    public static function new(&$obj) {
+    public static function initializeObject(&$obj) {
         if (is_subclass_of($obj, BaseObject::class)) return $obj;
-        if (isset($obj['$class'])) return ($obj = self::new($obj['$class'], $obj));
+        if (isset($obj['$class'])) return ($obj = self::newObject($obj));
         return $obj;
     }
 

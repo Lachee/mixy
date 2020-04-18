@@ -16,7 +16,8 @@ spl_autoload_register(function ($name)
     if ($name == false) return false;  
         
     //Try to find a map based of kiss
-    if (class_exists('\\kiss\\Kiss', false)) {
+    if (class_exists('\\kiss\\Kiss', false) && \kiss\Kiss::$app != null) {
+
 
         //Attempt to trim
         $base = \kiss\Kiss::$app->getBaseNamespace();
@@ -42,4 +43,4 @@ include 'config.php';
 if (empty($config)) { $config = []; }
 
 Global $kiss;
-$kiss = \kiss\models\BaseObject::new($config)
+$kiss = \kiss\models\BaseObject::new(\kiss\Kiss::class, $config);
