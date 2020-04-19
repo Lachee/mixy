@@ -101,22 +101,22 @@ class Kiss extends BaseObject {
     }
 
     /** Gets the current default response type. This can be used to determine how we should respond */
-    function getDefaultResponseType() { return $this->defaultResponseType; }
+    public function getDefaultResponseType() { return $this->defaultResponseType; }
     /** Sets the current defualt response type. */
-    function setDefaultResponseType($type) { $this->defaultResponseType = $type; return $this; }
+    public function setDefaultResponseType($type) { $this->defaultResponseType = $type; return $this; }
 
     /** Gets teh current base namespace */
-    function getBaseNamespace() { return $this->baseNamespace; }
+    public function getBaseNamespace() { return $this->baseNamespace; }
 
     /** The base directory
      * @return string
     */
-    function baseDir() { return KISS_AUTOLOAD_DIR; }
+    public function baseDir() { return KISS_AUTOLOAD_DIR; }
     
     /** The base URL 
      * @return string
      */
-    function baseURL() { return $this->baseUrl ?? sprintf( "%s://%s%s",
+    public function baseURL() { return $this->baseUrl ?? sprintf( "%s://%s%s",
         isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http',
         $_SERVER['SERVER_NAME'],
         $_SERVER['REQUEST_URI']
@@ -124,7 +124,7 @@ class Kiss extends BaseObject {
      }
 
     /** Responds based on the respons mode */
-    function respond($response, $status = HTTP::OK) {
+    public function respond($response, $status = HTTP::OK) {
         //Prepare the response if it isn't already a Response object.
         if (!($response instanceof Response)) {
 
@@ -148,10 +148,6 @@ class Kiss extends BaseObject {
 
         }
 
-        //SEt the session cookie
-        if ($this->session) {
-            setcookie(Session::JWT_COOKIE_NAME, $this->session->getJWT(), $this->session->getTokens()->exp);
-        }
 
         //Return the response
         $response->respond();

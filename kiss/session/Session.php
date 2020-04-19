@@ -12,7 +12,7 @@ use kiss\models\BaseObject;
 abstract class Session extends BaseObject {
 
     /** @var string the cookie name */
-    public const JWT_COOKIE_NAME = '_KISSJWT';
+    private const JWT_COOKIE_NAME = '_KISSJWT';
     
     /** @var string the name of the notification session */
     private const KEY_NOTIFICATIONS = '$notifications';
@@ -23,8 +23,8 @@ abstract class Session extends BaseObject {
     /** @var string the current JWT */
     private $jwt;
 
-    /** @var object session tokens from the JWT */
-    private $tokens = null;
+    /** @var object session claims from the JWT */
+    private $claims = null;
 
     /** @var int how long sessions last for in seconds by default. */
     public $sessionDuration = 24*60*60;
@@ -40,19 +40,30 @@ abstract class Session extends BaseObject {
     /** @return string the current JWT */
     public function getJWT() { return $this->jwt; }
 
-    /** @return object the current JWT tokens. */
-    public function getTokens() { return $this->tokens; }
+    /** @return object the current JWT claims. */
+    public function getClaims() { return $this->claims; }
+
+    /** @return object get a claim from the JWT, otherwise returns default. */
+    public function getClaim($claim, $default = null) { 
+        if ($this->hasClaim($claim)) return $this->claims->{$claim};
+        return $default;
+    }
+
+    /** @return bool checks if a claim exists */
+    public function hasClaim($claim) {
+        return property_exists($this->claims, $claim);
+    }
 
     /** Sets the current JWT. If the session details reset then the current session will be aborted. */
     public function setJWT($jwt, $destroySession = true) {
         if ($jwt == null) throw new ArgumentException('No valid JWT');
         $this->jwt = $jwt;
 
-        $this->tokens = Kiss::$app->jwtProvider->decode($this->jwt);
-        if (empty($this->tokens->sid)) throw new InvalidOperationException("Invalid Token");
+        $this->claims = Kiss::$app->jwtProvider->decode($this->jwt);
+        if (empty($this->claims->sid)) throw new InvalidOperationException("Invalid Token");
 
         $previousSessionId = $this->session_id;
-        $this->session_id = $this->tokens->sid;
+        $this->session_id = $this->claims->sid;
 
         //Start-Stop because there is a difference in id
         if ($destroySession && $previousSessionId != $this->session_id) 
@@ -60,7 +71,7 @@ abstract class Session extends BaseObject {
         
 
         //Store the JWT
-        HTTP::setCookie(self::JWT_COOKIE_NAME, $this->jwt, $this->tokens->exp);
+        HTTP::setCookie(self::JWT_COOKIE_NAME, $this->jwt, $this->claims->exp);
     }
 
     /** Gets the current session ID.
@@ -79,14 +90,18 @@ abstract class Session extends BaseObject {
         if ($sid == null) 
         {
             //Clear the cookie
-            $this->tokens   = null;
+            $this->claims   = null;
             $this->jwt      = null;
             HTTP::setCookie(self::JWT_COOKIE_NAME, '', 10);
         } 
         else 
         {
-            //Update what our JTW is
-            $jwt = Kiss::$app->jwtProvider->encode([ 'sid' => $sid ], $this->sessionDuration);
+            //Convert our previous claims
+            $claims = (array) $this->claims;
+            $claims['sid'] = $sid;
+
+            //Create a new JWT based of these claims and apply it.
+            $jwt = Kiss::$app->jwtProvider->encode($claims, $this->sessionDuration);
             $this->setJWT($jwt);
         }
         return $this;

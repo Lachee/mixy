@@ -8,21 +8,36 @@ use kiss\helpers\Response;
 use kiss\models\BaseObject;
 use app\models\User;
 use kiss\Kiss;
+use Mixy;
 
 class MainController extends MixyController {
     public static function getRouting() { return "/main"; }
 
     function actionTest() {
-        $potato = Kiss::$app->session->get('potato', 'potato');
-        Kiss::$app->session->set('potato', $potato . ' x potato');
-        return Response::redirect('index');
+      
+        $val =  Kiss::$app->session->get('oauth', 'no potato');
+
+        $response = Mixy::$app->mixer->guzzle->request('GET', 'broadcasts/current', [ 
+            'headers'   => [
+                'content-type' => 'application/json',
+                'Authorization' => "Bearer {$val['accessToken']}",
+            ]
+        ]);
+        $json = json_decode($response->getBody()->getContents(), true);
+
+
+        return Response::json(HTTP::OK, $json);
+        
+        return $this->render('index', [
+            'text' => Kiss::$app->session->getJWT(),
+            'value' => $val['accessToken']
+        ]);
     }
 
     function actionIndex() {
-        $val =  Kiss::$app->session->get('potato', 'no potato');
         return $this->render('index', [
             'text' => Kiss::$app->session->getJWT(),
-            'value' => $val
+            'value' => 'POTATE'
         ]);
     }
 
@@ -31,6 +46,7 @@ class MainController extends MixyController {
         $request = HTTP::json();
         $mixerUser = Kiss::$app->mixer->requestCurrentUser($request['data']);
         if ($mixerUser === null || empty($mixerUser->email)) throw new HttpException(HTTP::BAD_REQUEST, 'invalid tokens');
+
 
         //Find a user identity with the matching email
         /** @var User */
@@ -45,6 +61,9 @@ class MainController extends MixyController {
         $user->updateFromMixerUser($mixerUser);
         $user->login();
         $success = $user->save();
+
+        //Store the access token for testing
+        Mixy::$app->session->set("oauth", $request['data']);
 
         //return the result of the save
         return Response::json(HTTP::OK, $success);

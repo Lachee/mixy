@@ -28,8 +28,8 @@ use kiss\Kiss;
             <div class="navbar-start">
                 <div class="navbar-item">
                     <p class="control">
-                        <?php if (($user = Kiss::$app->mixer->debugGetUser()) != null): ?>
-                            <a class="button" id="login-button" href="https://mixer.com/<?= HTML::encode($user->channel['token']); ?>" >
+                        <?php if (($user = Mixy::$app->getUser()) != null): ?>
+                            <a class="button" id="login-button" href="https://mixer.com/<?= HTML::encode($user->username); ?>" >
                                 <span class="icon"><i class="fab fa-mixer"></i></span>
                                 <span><?= $user->username ?></span>
                             </a>

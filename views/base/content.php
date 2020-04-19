@@ -30,6 +30,21 @@ use widget\Notification;
             <?php endif;?>
         </div>
     </div>
+    
+
+    <footer class="footer">
+        <div class="content has-text-centered">
+            <div class="level">
+                <div class="level-item">
+                    <img src="http://jwt.io/img/badge-compatible.svg">
+                </div>
+                <div class="level-item">
+                    im a potato
+                </div>
+
+            </div>
+        </div>
+    </footer>
 </body>
 
 
