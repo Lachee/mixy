@@ -54,26 +54,22 @@ class Mixer extends BaseObject {
         return BaseObject::new(MixerShortCode::class, $json);
     }
 
-    /** Creates a new oauth user with the access tokens */
-    public function requestCurrentUser($tokens) {
+    /** Gets a user that owns the access tokens
+     * @return MixerUser|null the user that owns the Access Token
+     */
+    public function getOwner($accessToken) {
         $response = $this->guzzle->request('GET', 'users/current', [ 
             'headers'   => [
                 'content-type' => 'application/json',
-                'Authorization' => "Bearer {$tokens['accessToken']}",
+                'Authorization' => "Bearer {$accessToken}",
             ]
         ]);
 
         $json = json_decode($response->getBody()->getContents(), true);
         $json['mixer'] = $this;
-        $json['tokens'] = $tokens;
+        $json['accessToken'] = $accessToken;
+        
         return BaseObject::new(MixerUser::class, $json);
-    }
-
-    public function debugGetUser() { 
-        if (($tokens = Kiss::$app->session->get('mixer_tokens', null)) != null) {
-            return $this->requestCurrentUser($tokens);
-        }
-        return null;
     }
 
 }

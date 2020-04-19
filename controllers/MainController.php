@@ -43,30 +43,37 @@ class MainController extends MixyController {
 
     /** Authorizes a token */
     function actionAuth() {
-        $request = HTTP::json();
-        $mixerUser = Kiss::$app->mixer->requestCurrentUser($request['data']);
-        if ($mixerUser === null || empty($mixerUser->email)) throw new HttpException(HTTP::BAD_REQUEST, 'invalid tokens');
+        try {
+            $request = HTTP::json();
+            $mixerUser = Kiss::$app->mixer->getOwner($request['data']['accessToken']);
+            if ($mixerUser === null || empty($mixerUser->email)) throw new HttpException(HTTP::BAD_REQUEST, 'invalid tokens');
 
+            //Find a user identity with the matching email
+            /** @var User $user the current user*/
+            $user = User::findByEmail($mixerUser->email)->one();
+            if ($user == null) {
+                //Create a new user. Welcome
+                $user = new User([ 'email' => $mixerUser->email ]);
+                Kiss::$app->session->addNotification('Your account has been created!');
+            }
 
-        //Find a user identity with the matching email
-        /** @var User */
-        $user = User::findByEmail($mixerUser->email)->one();
-        if ($user == null) {
-            //Create a new user. Welcome
-            $user = BaseObject::new(User::class, [ 'email' => $mixerUser->email ]);
-            Kiss::$app->session->addNotification('Your account has been created!');
+            //Update exiting values. We are going to save early just in case we are a new user
+            $user->updateFromMixerUser($mixerUser);
+            $user->setOauthTokens($request['data']);
+            $user->save();
+
+            //Login
+            $success = $user->login();
+            return Response::json(HTTP::OK, $success);
+        }catch(\Exception $e) {
+            Kiss::$app->session->addNotification($e->getMessage(), 'danger');
+            return Response::json(HTTP::INTERNAL_SERVER_ERROR, $e);
         }
+    }
 
-        //Update exiting values
-        $user->updateFromMixerUser($mixerUser);
-        $user->login();
-        $success = $user->save();
-
-        //Store the access token for testing
-        Mixy::$app->session->set("oauth", $request['data']);
-
-        //return the result of the save
-        return Response::json(HTTP::OK, $success);
+    function actionLogout() {
+        if (($user = Mixy::$app->getUser()))  $user->logout();
+        return Response::redirect('/');
     }
 
     function actionAuthoridddze() {

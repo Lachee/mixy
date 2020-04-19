@@ -31,8 +31,8 @@ class Kiss extends BaseObject {
     /** @var string main controller */
     public $mainController = 'app\\controllers\\MainController';
 
-    /** @var ICache the current cache */
-    protected $cache = null;
+    /** @var \Predis\Client the current redis instance */
+    protected $redis = null;
 
     /** Node Provider for uuids. */
     public $uuidNodeProvider =  null;
@@ -42,7 +42,6 @@ class Kiss extends BaseObject {
     
     /** @var string default response type */
     private $defaultResponseType = 'text/html';
-
 
     /** @var BaseObject[] collection of components */
     protected $components = [];
@@ -70,11 +69,12 @@ class Kiss extends BaseObject {
         if ($this->uuidNodeProvider == null)
             $this->uuidNodeProvider = new \Ramsey\Uuid\Provider\Node\RandomNodeProvider();
         
-        //Prepare the DB
+        if ($this->redis == null)
+            $this->redis = new \Predis\Client();
+            
         if ($this->db != null) 
             $this->db = new Connection($this->db['dsn'],$this->db['user'],$this->db['pass'], array(), $this->db['prefix']);
         
-
         if (KISS_SESSIONLESS) {
             $this->session = null;
         } else {
@@ -88,9 +88,9 @@ class Kiss extends BaseObject {
         return $this->db;
     }
 
-    /** @return ICache the current cache. */
-    public function cache() {
-        return $this->cache;
+    /** @return \Predis\Client the current redis client */
+    public function redis() {
+        return $this->redis;
     }
 
     /** magic get value */

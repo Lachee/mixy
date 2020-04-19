@@ -36,7 +36,7 @@ use widget\Notification;
         <div class="content has-text-centered">
             <div class="level">
                 <div class="level-item">
-                    <img src="http://jwt.io/img/badge-compatible.svg">
+                    <a href="https://jwt.io" target="_blank"><img src="http://jwt.io/img/badge-compatible.svg"></a>
                 </div>
                 <div class="level-item">
                     im a potato

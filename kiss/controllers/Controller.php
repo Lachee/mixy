@@ -4,8 +4,10 @@ namespace kiss\controllers;
 //Little script to verify the DEBUG exists.
 if (!defined("XVE_DEBUG")) define("XVE_DEBUG", false);
 
+use Exception;
 use kiss\exception\HttpException;
 use kiss\helpers\HTTP;
+use kiss\helpers\Response;
 use kiss\helpers\StringHelper;
 use kiss\Kiss;
 use kiss\router\Route;
@@ -157,15 +159,19 @@ class Controller extends Route {
 
     /** Performs the endpoint's action */
     public function action($endpoint) {
-        //Attempt to get the event
-        $action = $this->getAction($endpoint);
-        if ($action === false) {
-            throw new HttpException(HTTP::NOT_FOUND, 'endpoint could not be found.');
-        }
+        try {
+            //Attempt to get the event
+            $action = $this->getAction($endpoint);
+            if ($action === false) {
+                throw new HttpException(HTTP::NOT_FOUND, 'endpoint could not be found.');
+            }
 
-        //Perform the action
-        $response = $this->{$action}();
-        return Kiss::$app->respond($response);
+            //Perform the action
+            $response = $this->{$action}();
+            return Kiss::$app->respond($response);
+        }catch(Exception $e) {
+            return Response::exception($e);
+        }
     }
 
     /** Gets the action name */

@@ -7,8 +7,8 @@ class MixerUser extends BaseObject {
     /** @var Mixer mixer instance */ 
     public $mixer;
 
-    /** Accesse Tokens */
-    public $tokens;
+    /** Internal cache of the access token, to be able to make future requests */
+    protected $accessToken;
 
     public $id;
     public $level;
@@ -22,6 +22,7 @@ class MixerUser extends BaseObject {
     public $bio;
     public $primaryTeam;
 
+    /** @var MixerChannel channel */
     public $channel;
     public $twoFactor;
 

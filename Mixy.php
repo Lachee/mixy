@@ -17,8 +17,8 @@ class Mixy extends Kiss {
     protected function init() {
         parent::init();
 
-        $sub = $this->session->getClaim('sub', null);
-        if ($sub != null) $this->user = User::findByKey($sub)->one();
+        /** @var User */
+        $this->user = User::findBySession()->one();
     }
 
 
