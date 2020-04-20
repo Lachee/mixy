@@ -89,8 +89,7 @@ class User extends ActiveRecord {
 
         //Create a new JWT for the user
         $jwt = $this->jwt([
-            'type'      => 'login',
-            'username'  => $this->username,
+            'src'      => 'login',
             'sid'       => Kiss::$app->session->getSessionId(),
         ]);
 
