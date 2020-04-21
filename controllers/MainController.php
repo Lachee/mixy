@@ -63,7 +63,12 @@ class MainController extends MixyController {
             }
 
             //Update exiting values. We are going to save early just in case we are a new user
-            $user->setMixerUser($mixerUser)->setOauthContainer($request['data']);
+            $user->setMixerUser($mixerUser)->setOauthContainer([
+                'access_token'  => $request['data']['accessToken'],
+                'expires_at'    => $request['data']['expiresAt'],
+                'refresh_token' => $request['data']['refreshToken'],
+                'scopes'        => $request['data']['scopes']
+            ]);
             $user->save();
 
             //Actually login, setting the session

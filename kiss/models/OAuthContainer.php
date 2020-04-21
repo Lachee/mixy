@@ -60,16 +60,23 @@ class OAuthContainer extends BaseObject {
         $keyRefresh = self::REDIS_NAMESPACE . ":{$this->identity}:{$this->application}:meta";
         $keyAccess  = self::REDIS_NAMESPACE . ":{$this->identity}:{$this->application}:access";
 
+        $expiresAt = isset($tokens['expires_at']) ? strtotime($tokens['expires_at']) 
+                                                    : ($tokens['expires_in'] + time());
+
+        $set = [
+            'refreshToken'  => $tokens['refresh_token'],
+            'expiresAt'     => $expiresAt,
+        ];
+
+        if (!empty($tokens['scopes'])) 
+            $set['scopes'] = join(' ', $tokens['scopes'] ?? []);
+            
         //Set the values
-        Kiss::$app->redis()->set($keyAccess, $tokens['accessToken']);
-        Kiss::$app->redis()->hmset($keyRefresh, [
-            'refreshToken'  => $tokens['refreshToken'],
-            'expiresAt'     => $tokens['expiresAt'],
-            'scopes'        => join(' ', $tokens['scopes'])
-        ]);
+        Kiss::$app->redis()->set($keyAccess, $tokens['access_token']);
+        Kiss::$app->redis()->hmset($keyRefresh, $set);
 
         //TTL the values
-        $accessExpiry = strtotime($tokens['expiresAt']) - time();
+        $accessExpiry = $expiresAt - time();
         Kiss::$app->redis()->expire($keyAccess, $accessExpiry);
 
         $refreshExpiry = $this->refreshDuration;
@@ -100,7 +107,7 @@ class OAuthContainer extends BaseObject {
         if ($meta == null || empty($meta['refreshToken'])) throw new MissingOauthException('There is no available refresh token');
 
         $this->refreshToken = $meta['refreshToken'];
-        $this->expiresAt    = new DateTime($meta['expiresAt']);
+        $this->expiresAt    = $meta['expiresAt'] ?? -1;
         $this->scopes       = explode(' ', $meta['scopes']);
         return $this;
     }
@@ -129,7 +136,7 @@ class OAuthContainer extends BaseObject {
         $body = [
             'client_id'     => $options['client_id'],
             'redirect_uri'  => $options['redirect_uri'],
-            'code'          => $refreshToken,
+            'refresh_token' => $refreshToken,
             'grant_type'    => 'refresh_token',
         ];
 
