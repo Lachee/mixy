@@ -2,7 +2,7 @@
 
 use kiss\helpers\HTML;
 use kiss\Kiss;
-
+$user = Mixy::$app->getUser()
 ?>
 <!-- START NAV -->
 <nav class="navbar">
@@ -17,29 +17,39 @@ use kiss\Kiss;
         </div>
         <div id="navMenu" class="navbar-menu">
             <div class="navbar-start">
-                <a class="navbar-item" href="<?= HTML::href('/')?>">Home</a>
-                <a class="navbar-item" href="<?= HTML::href('/test')?>">Test</a>
-                <a class="navbar-item" href="<?= HTML::href('/editor/100/')?>">Editor</a>
-                <!--<a class="navbar-item" href="admin.html">Exceptions</a>-->
-                <a class="navbar-item" href="<?= HTML::href('/manager/')?>">Services</a>
+                <?php if ($user): ?>
+                    <a class="navbar-item" href="<?= HTML::href('/screen/')?>">Screens</a>
+                    <a class="navbar-item" href="<?= HTML::href('/editor/')?>">Editor</a>
+                    <!--<a class="navbar-item" href="admin.html">Exceptions</a>-->
+                    <a class="navbar-item" href="<?= HTML::href('/account/')?>">Account</a>
+                <?php endif;  ?>
             </div>
         </div>
         <div id="navMenu" class="navbar-end">
             <div class="navbar-start">
                 <div class="navbar-item">
-                    <p class="control">
-                        <?php if (($user = Mixy::$app->getUser()) != null): ?>
-                            <a class="button" id="login-button" href="https://mixer.com/<?= HTML::encode($user->username); ?>" >
-                                <span class="icon"><i class="fab fa-mixer"></i></span>
-                                <span><?= $user->username ?></span>
-                            </a>
-                        <?php else: ?>
+                    <?php if ($user): ?>
+                        <div class="field has-addons"> 
+                            <p class="control">
+                                <a class="button" id="login-button" href="https://mixer.com/<?= HTML::encode($user->username); ?>" >
+                                    <span class="icon"><i class="fab fa-mixer"></i></span>
+                                    <span><?= HTML::encode($user->username) ?></span>
+                                </a>
+                            </p>
+                            <p class="control">
+                                <a class="button" href="<?= HTML::href(['/logout']); ?>">
+                                    <span class="icon"><i class="far fa-sign-out"></i></span>
+                                </a>
+                            </p>
+                        </div>
+                    <?php else: ?>
+                        <p class="control">
                             <a class="button" id="login-button">
                                 <span class="icon"><i class="fab fa-mixer"></i></span>
                                 <span>Login</span>
                             </a>
-                        <?php endif; ?>
-                    </p>
+                        </p>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

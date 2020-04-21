@@ -134,6 +134,7 @@ class ActiveRecord extends BaseObject{
     /** Sets the results from the query */
     public function setQueryResult($result) {
         $this->beforeQueryLoad($result);
+        $this->beforeLoad($result);
         foreach($result as $key => $pair) {
             $type = self::getPropertyType($key);
             switch($type) {
@@ -156,6 +157,7 @@ class ActiveRecord extends BaseObject{
 
             $this->_columns[] = $key;
         }
+        $this->afterLoad($result, true);
         $this->afterQueryLoad($result);
     }
 

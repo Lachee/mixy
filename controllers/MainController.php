@@ -9,6 +9,7 @@ use kiss\models\BaseObject;
 use app\models\User;
 use kiss\Kiss;
 use Mixy;
+use Ramsey\Uuid\Uuid;
 
 class MainController extends MixyController {
     public static function getRouting() { return "/main"; }
@@ -43,7 +44,8 @@ class MainController extends MixyController {
 
     /** Authorizes a token */
     function actionAuth() {
-        try {
+        try 
+        {
             $request = HTTP::json();
             $mixerUser = Kiss::$app->mixer->getOwner($request['data']['accessToken']);
             if ($mixerUser === null || empty($mixerUser->email)) throw new HttpException(HTTP::BAD_REQUEST, 'invalid tokens');
@@ -53,19 +55,22 @@ class MainController extends MixyController {
             $user = User::findByEmail($mixerUser->email)->one();
             if ($user == null) {
                 //Create a new user. Welcome
-                $user = new User([ 'email' => $mixerUser->email ]);
+                $user = new User([ 
+                    'uuid' => Uuid::uuid1(Kiss::$app->uuidNodeProvider->getNode()),
+                    'email' => $mixerUser->email
+                ]);
                 Kiss::$app->session->addNotification('Your account has been created!');
             }
 
             //Update exiting values. We are going to save early just in case we are a new user
-            $user->updateFromMixerUser($mixerUser);
-            $user->setOauthTokens($request['data']);
+            $user->setMixerUser($mixerUser)->setOauthContainer($request['data']);
             $user->save();
 
-            //Login
+            //Actually login, setting the session
             $success = $user->login();
             return Response::json(HTTP::OK, $success);
-        }catch(\Exception $e) {
+        }
+        catch(\Exception $e) {
             Kiss::$app->session->addNotification($e->getMessage(), 'danger');
             return Response::json(HTTP::INTERNAL_SERVER_ERROR, $e);
         }

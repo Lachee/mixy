@@ -57,6 +57,7 @@ class HTML {
         return $url . $query;
     }
 
+    /** @return string encodes the content to be HTML safe */
     public static function encode($text) {
         return htmlspecialchars($text);
     }

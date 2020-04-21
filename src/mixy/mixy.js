@@ -52,16 +52,17 @@ export async function mixerLogin() {
     if (tokens) {
 
         //Store the tokens
-        await fetch('/auth', {
+        let response = await fetch('/auth', {
             method: 'POST',
             credentials: 'include',
             headers: { 'content-type': 'application/json' },
             body: JSON.stringify(tokens),
         });
 
-        //Return 
-        return true;
-}
+        if (response.ok) return true;
+        return response.statusText;
+    }
+
     return false;
 }
 

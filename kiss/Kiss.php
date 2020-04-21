@@ -97,7 +97,6 @@ class Kiss extends BaseObject {
     public function __get($name) {
         if (isset($this->components[$name]))
             return $this->components[$name];
-        return parent::__get($name);
     }
 
     /** Gets the current default response type. This can be used to determine how we should respond */

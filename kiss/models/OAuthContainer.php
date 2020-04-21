@@ -4,6 +4,7 @@ use DateTime;
 use kiss\exception\ExpiredOauthException;
 use kiss\exception\MissingOauthException;
 use kiss\Kiss;
+use GuzzleHttp\Client as Guzzle;
 
 class OAuthContainer extends BaseObject {
     
@@ -36,7 +37,7 @@ class OAuthContainer extends BaseObject {
     public function getScopes() { return $this->scopes; }
 
     /** Checks the cahce for the current access token. If none is available, then a ExpiredOauthException will be thrown.
-     * @throws ExpiredOauthException thrown when there is no access token.
+     * @throws ExpiredOauthException thrown when there is no access token. Its recommended to call [[refresh]] if th is occures.
      *  @return string the current access token.  */
     public function getAccessToken() {        
         $keyAccess  = self::REDIS_NAMESPACE . ":{$this->identity}:{$this->application}:access";
@@ -104,9 +105,52 @@ class OAuthContainer extends BaseObject {
         return $this;
     }
 
-    //We cannot do this because we need to know the identity
-    //public static function fromTokens($tokens) {
-    //    return (new OAuthContainer())->setTokens($tokens);
-    //}
+    /** Creates a refresh request using the cached refreshToken.
+     * @param Guzzle $guzzle the guzzle client to make the request. If null, a new client will be used and the $endpoint has to be absolute.
+     * @param string[] $options collection of additional options. All that are listed here are required
+     * [ 
+     *      string      client_id       The client ID of the oAuth2 application
+     *      string?     client_secret   The client secret. Don't supply if you dont got.
+     *      string      redirect_uri    Where to redirect back too
+     *      string      endpoint        The endpoint. By default it is oauth/token. Dont supply if you dont need to change it. This has to be absolute if no guzzle client is provided.
+     * ]
+     *  
+     * If the $guzzle is null, then this must be absolute.
+     * @throws MissingOauthException thrown when there is no valid meta data.
+     * @return OAuthContainer the updated container.
+     */
+    public function refresh($guzzle, $options = []) {
+        
+        //Update the cache and prepare the token
+        $this->loadRedis();
+        $refreshToken = $this->getRefreshToken();
 
+        //Prepare the payload
+        $body = [
+            'client_id'     => $options['client_id'],
+            'redirect_uri'  => $options['redirect_uri'],
+            'code'          => $refreshToken,
+            'grant_type'    => 'refresh_token',
+        ];
+
+        //set the client secret
+        if (isset($options['client_secret']))
+            $body['client_secret'] = $options['client_secret'];
+
+        //prepare t he endpoint and the guzzle
+        $endpoint = $options['endpoint'] ?? 'oauth/token';
+        if ($guzzle == null) $guzzle = new Guzzle();
+
+        //Creat ethe resposne
+        $response = $guzzle->request('POST', $endpoint, [
+            'json'      => $body,
+            'headers'   => [
+                'content-type' => 'application/json'
+            ],
+        ]);
+
+        //Decode and set the tokens.
+        $json = json_decode($response->getBody()->getContents(), true);
+        return $this->setTokens($json);
+    }
 }

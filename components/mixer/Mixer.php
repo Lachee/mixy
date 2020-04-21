@@ -1,9 +1,10 @@
 <?php namespace app\components\mixer;
 
 use kiss\models\BaseObject;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
-use kiss\Kiss;
+use kiss\exception\ExpiredOauthException;
+use kiss\helpers\HTML;
+use kiss\models\OAuthContainer;
+use Mixy;
 
 class Mixer extends BaseObject {
     const USER_AGENT = 'KISS Client/1';
@@ -55,9 +56,33 @@ class Mixer extends BaseObject {
     }
 
     /** Gets a user that owns the access tokens
+     * @param OAuthContainer|string $oauth The oAuth Container, or the accessToken.
      * @return MixerUser|null the user that owns the Access Token
      */
-    public function getOwner($accessToken) {
+    public function getOwner($oauth) {
+    
+        $accessToken = $oauth;
+    
+        //If the accessToken is actually a container, we need to do some pre-processing.
+        if ($oauth instanceof OAuthContainer) {
+            /** @var OAuthContainer */
+            $container = $oauth;
+
+            try  {
+                //Try to get the access token
+                $accessToken = $container->getAccessToken();
+            } 
+            catch(ExpiredOauthException $expiredException) 
+            {
+                //Refresh the token
+                $accessToken = $container->refresh($this->guzzle, [
+                    'client_id'     => $this->clientId,
+                    'client_secret' => $this->clientSecret,
+                    'redirect_uri'  => HTML::href('/auth'),
+                ])->getAccessToken();
+            }
+        }
+
         $response = $this->guzzle->request('GET', 'users/current', [ 
             'headers'   => [
                 'content-type' => 'application/json',
