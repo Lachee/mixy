@@ -1,6 +1,5 @@
 import './page.scss';
 import '../mixy/mixy';
-import e from 'express';
 
 export function test() { 
     console.log("yup");
