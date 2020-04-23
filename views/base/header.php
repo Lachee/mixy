@@ -36,7 +36,11 @@ $theme = HTTP::get('theme', 'lumen');
     <!-- Webpacks -->
     <script src="/dist/kiss.js"></script>
     <link rel="stylesheet" href="/dist/kiss.css">
+    
+    <!-- Dependencies -->
+    <script src="/dist/mixy.js"></script>
+
+    <!-- App -->
     <script src="/dist/app.js"></script>
     <link rel="stylesheet" href="/dist/app.css">
-    <script src="/dist/mixy.js"></script>
 </head>

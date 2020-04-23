@@ -44,9 +44,9 @@ class Controller extends Route {
     }
 
     /** Registers a constant variable to be declared */
-    public function registerJsVariable($name, $value, $position = self::POS_START, $scope = 'const') {
+    public function registerJsVariable($name, $value, $position = self::POS_START, $scope = 'const', $encode = true) {
         $name = str_replace(' ', '_', $name);
-        $this->js[$position]["_$name"] = "{$scope} {$name} = " . json_encode($$value) . ";"; 
+        $this->js[$position]["_$name"] = "{$scope} {$name} = " . ($encode ? json_encode($value) : $value) . ";"; 
     }
 
     /** Registers some javascript */

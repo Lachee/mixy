@@ -1,64 +1,164 @@
+import './bulma-mod.css';
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";	//Imports Monaco
-import Mixy from "../mixy/mixy";									//Imports my Mixy Library. Webpack externals rule overrides this.
+import util from 'util';
+import EventEmitter from 'events';
 
-(async function () {
-	// create div to avoid needing a HtmlWebpackPlugin template
-	const div = document.createElement('div');
-	div.id = 'root';
-	div.style = 'width:800px; height:600px; border:1px solid #ccc;';
-	document.body.appendChild(div);
+/** Wrapper around the monaco editor that provides a clean default enviroment
+ * events:
+ * 	languageChanged
+ * 	save
+ * 	run
+ */
+export class MonacoEditor extends EventEmitter{
 
+	#editor = null;
+	#languageModels = { 'js': {}, 'css': {}, 'html': {}};
+	#languageStates = { 'js': {}, 'css': {}, 'html': {}};
+	#currentLanguage = 'js';
 
-	// validation settings
-	monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
-		noSemanticValidation: true,
-		noSyntaxValidation: false
-	});
+	constructor(container) {
+		super();
+		const self = this;
 
-	// compiler options
-	monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
-		target: monaco.languages.typescript.ScriptTarget.ES6,
-		allowNonTsExtensions: true,
-		allowJs: true,
-	});
+		// validation settings
+		monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+			noSemanticValidation: true,
+			noSyntaxValidation: false
+		});
 
-	
-	//This does work, but having to redefine my library in here would be less than ideal
-	const fact = `declare namespace custom { export function onMyEvent(event: customClass): void;
-		export class customClass { 
-			customProperty: string;
-		}`;
-	monaco.languages.typescript.javascriptDefaults.addExtraLib(fact, 'myCustomNamespace');
-	
-	//This doesn't work. No errors occur, but there is also no auto-complete for 'Mixy' or 'mixy' or '(new Mixy())'
-	let response = await fetch('/dist/mixy.js');
-	let body = await response.text();
-	monaco.languages.typescript.javascriptDefaults.addExtraLib(body, 'mixyjs');
+		// compiler options
+		monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+			target: monaco.languages.typescript.ScriptTarget.ES6,
+			allowNonTsExtensions: true,
+			allowJs: true,
+		});
 
+		// Import the types from the file
+		import( './types.js');
+		
+		// Create the monaco this.#editor
+		this.#editor = monaco.editor.create(
+			container,
+			{ theme: 'vs-dark' }
+		);
 
-	let editor = monaco.editor.create(
-		document.getElementById('root'),
-		{
-			value: 'var a = 1;',
-			language: 'javascript',
-			theme: 'vs-dark'
-		}
-	);
-})();
+		// Create a custom action to switch between stuff
+		this.#editor.addAction({
+			id: 'mixy.language.switch.html',
+			label: 'Go to HTML',	
+			keybindings: [
+				monaco.KeyMod.chord(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_H)
+			],
+			precondition: null,
+			keybindingContext: null,	
+			contextMenuGroupId: 'navigation',	
+			contextMenuOrder: 1.5,
+			run: function(ed) { self.#changeLanguage('html'); }
+		});
+		this.#editor.addAction({
+			id: 'mixy.language.switch.js',
+			label: 'Go to JavaScript',	
+			keybindings: [
+				monaco.KeyMod.chord(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_J)
+			],
+			precondition: null,
+			keybindingContext: null,	
+			contextMenuGroupId: 'navigation',	
+			contextMenuOrder: 1.5,
+			run: function(ed) { self.#changeLanguage('js'); }
+		});
+		this.#editor.addAction({
+			id: 'mixy.language.switch.css',
+			label: 'Go to CSS',	
+			keybindings: [
+				monaco.KeyMod.chord(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_K)
+			],
+			precondition: null,
+			keybindingContext: null,	
+			contextMenuGroupId: 'navigation',	
+			contextMenuOrder: 1.5,
+			run: function(ed) { self.#changeLanguage('css'); }
+		});
 
-/*
-editor.onDidChangeCursorPosition((e) => {
-	const code = editor.getValue();
-	const offset = editor.getModel().getOffsetAt(e.position);
-	const start = code.indexOf("<script>", offset);
-	const end = code.indexOf("</script>", offset);
+		this.#editor.addAction({
+			id: 'mixy.save',
+			label: 'Save',	
+			keybindings: [
+				monaco.KeyMod.chord(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S)
+			],
+			precondition: null,
+			keybindingContext: null,	
+			contextMenuGroupId: null,	
+			contextMenuOrder: 1.5,
+			run: function(ed) {  self.emit("save", self.#languageModels); }
+		});
+		this.#editor.addAction({
+			id: 'mixy.save.run',
+			label: 'Save & Run',	
+			keybindings: [
+				monaco.KeyMod.chord(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_H)
+			],
+			precondition: null,
+			keybindingContext: null,	
+			contextMenuGroupId: null,	
+			contextMenuOrder: 1.5,
+			run: function(ed) { self.emit("save", self.#languageModels); self.emit('run'); }
+		});
 
-	if (start > end || (start == -1 && end != -1)) {
-		console.log(offset, start, end, "JS");
-		monaco.editor.setModelLanguage(editor.getModel(), "javascript");
-	}  else {
-		console.log(offset, start, end, "HTML");
-		monaco.editor.setModelLanguage(editor.getModel(), "html");
+		//setup the languages
+		this.#languageModels.js = monaco.editor.createModel('var success = mixy.mixerLogin();\nalert(success);','javascript');
+		this.#languageModels.css = monaco.editor.createModel( '.container {\n}', 'css' );
+		this.#languageModels.html = monaco.editor.createModel(  '<div class="container">\n<!-- stuff here -->\n</div>', 'html' );
+
+		//set the initial model to JS
+		this.#editor.setModel(this.#languageModels.js);
 	}
-});
-*/
+
+		
+	/** Sets a language */
+	setLanguage(language) {
+		return this.#editor.trigger("monacolib", `mixy.language.switch.${language}`);
+	}
+
+	/** Gets the current language */
+	get language() { 
+		return this.#currentLanguage;
+	}
+
+	/** Sets the code for a language */
+	setValue(language, code) {
+		this.#languageModels[language].setValue(code);
+	}
+
+	/** Sets the code for multiple languages */
+	setValues(codes) {
+		for(let language in codes) {
+			this.setValue(language, codes[language]);
+		}
+	}
+
+	/** Triggers a Command Pallette action */
+	triggerAction(source, handler, payload) {
+		return this.#editor.trigger(source, handler, payload);
+	}
+	
+
+	/** Changes the editor language and invokes events */
+	#changeLanguage(language) {
+
+		//Save the current language state
+		this.#languageStates[this.#currentLanguage] = this.#editor.saveViewState();
+	
+		//Apply the new language state
+		this.#editor.setModel(this.#languageModels[language]);
+		this.#editor.restoreViewState(this.#languageStates[language]);
+		this.#editor.focus();
+	
+		//Remeber our new langauge
+		this.#currentLanguage = language;
+		this.emit("languageChanged", language, this.#languageModels[language]);
+
+	}
+
+
+}

@@ -9,8 +9,7 @@ export class Mixy {
     #mixerOAuthClient;
     #shortCodeModal;
 
-    /** Sets teh defaults configuration from the outside */
-    configureOAuth(options) {
+    constructor(options) {
         this.#mixerOAuthClient = new OAuthClient(options);
     }
 
@@ -71,6 +70,8 @@ export class Mixy {
     #getShortCodeModal() {
         if (this.#shortCodeModal != null) return this.#shortCodeModal;
 
+        var document=document || {};
+
         //@ts-ignore
         this.#shortCodeModal = document.createModal(`
             <section class="hero is-primary">
@@ -120,5 +121,6 @@ export class Mixy {
         });
 
         return this.#shortCodeModal;
+       
     }
 }
