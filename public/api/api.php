@@ -48,9 +48,21 @@ function handle_request() {
         switch ($_SERVER['REQUEST_METHOD']) {
             default: break;
 
+            case 'OPTIONS': 
+                if (method_exists($controller, 'options'))
+                    return $controller->options();
+                break;      
+
             case 'GET': 
                 if (method_exists($controller, 'get'))
                     return $controller->get();
+                break;          
+            case 'HEAD': 
+                if (method_exists($controller, 'get')) {
+                    $response = $controller->get();
+                    $response->setContent(null);
+                    return $response;
+                }
                 break;      
             
             case 'DELETE': 

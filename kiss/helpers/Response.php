@@ -106,11 +106,12 @@ class Response {
     }
 
     /** Sets the response contents and returns the response itself. */
-    public function setContent($content, $type = null) {
-        $this->data = $content;
-        if ($type != null) $this->setContentType($type);
+    public function setContent($content, $contentType = null) {
+        $this->content = $content;
+        $this->contentType = $contentType ?? $this->contentType;
         return $this;
     }
+
 
     /** Executes the response, setting the current page's response code & headers, echoing out the contents and then exiting. */
     public function respond() {

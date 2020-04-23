@@ -127,6 +127,7 @@ export class MonacoEditor extends EventEmitter{
 
 	/** Sets the code for a language */
 	setValue(language, code) {
+		console.log("load", language, code);
 		this.#languageModels[language].setValue(code);
 	}
 
@@ -142,7 +143,6 @@ export class MonacoEditor extends EventEmitter{
 		return this.#editor.trigger(source, handler, payload);
 	}
 	
-
 	/** Changes the editor language and invokes events */
 	#changeLanguage(language) {
 
