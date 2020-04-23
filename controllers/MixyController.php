@@ -32,7 +32,7 @@ class MixyController extends Controller {
             'scopes'    => Kiss::$app->mixer->scopes,
         ];
 
-        $this->registerJs("mixy.configureOAuth(" . json_encode($mixyDefaults) . ");");
+        $this->registerJsVariable("mixy", "new mixlib.Mixy(" . json_encode($mixyDefaults) . ")", Controller::POS_END, 'const', false);
         return parent::render($action, $options);
     }
 }

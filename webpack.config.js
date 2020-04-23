@@ -1,6 +1,42 @@
+const webpack = require('webpack');
 const path = require('path');
-const CopyPlugin = require('copy-webpack-plugin');the
+const CopyPlugin = require('copy-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
+const DeclarationBundlerPlugin = require('declaration-bundler-webpack-plugin');
 
+const Externals = {  
+  'mixy/mixy': 'mixlib',
+  '../mixy/mixy': 'mixlib',
+  'monaco/index': 'monacolib',
+  '../monaco/index': 'monacolib',
+}
+
+const JSRule = {
+  test: /\.m?js$/,
+  exclude: /node_modules/,
+  use:  {
+    loader: 'babel-loader', 
+    options: {                
+      presets: ['@babel/preset-env'],
+      plugins: [
+        "@babel/plugin-proposal-class-properties",
+        "@babel/plugin-proposal-private-methods",
+        '@babel/plugin-transform-runtime'
+      ]
+    },
+  }
+};
+
+const SASSRule = {
+  test: /\.s?[ac]ss$/i,
+  exclude: /view.*/,
+  use: [
+    MiniCssExtractPlugin.loader,
+    { loader: 'css-loader' },
+    { loader: 'sass-loader', options: { sourceMap: true } },
+  ]
+};
 
 const AppConfiguration = {
     entry: './src/app/app.js',
@@ -12,21 +48,17 @@ const AppConfiguration = {
         library: 'app',
     },
     module: {
-        rules: [
+      rules: [
+        JSRule,
+        SASSRule,
         {
-          test: /\.s?[ac]ss$/i,
-          use: [
-            MiniCssExtractPlugin.loader,
-            { loader: 'css-loader' },
-            { loader: 'sass-loader', options: { sourceMap: true } },
-          ]
+          test: /view.*\.s?[ac]ss$/i,
+          use: [ 'style-loader', 'css-loader', 'sass-loader' ],
         }
       ]
     },
-    plugins: [  new MiniCssExtractPlugin({ filename: 'app.css' }),  ],
-    externals: {
-      'mixy/app': 'mixy'
-    }
+    plugins: [  new MiniCssExtractPlugin({ filename: 'app.css' }) ],
+    externals: Externals
 };
 
 const MixyConfiguration = {
@@ -36,34 +68,56 @@ const MixyConfiguration = {
         chunkFilename: 'vendor.[name].js',
         path: path.resolve(__dirname, 'public/dist'),
         publicPath: '/dist/',
-        library: 'mixy',
-
+        library: 'mixlib',
     },
     module: {
         rules: [
+          JSRule,
           {
             test: /\.css$/i,
-            use: [
-                'style-loader',
-                'css-loader',
-                'sass-loader',
-            ],
-        },
-        {
-          test: /\.s[ac]ss$/i,
-          use: [
-            MiniCssExtractPlugin.loader,
-            { loader: 'css-loader' },
-            { loader: 'sass-loader', options: { sourceMap: true } },
-          ]
-        }
+            use: [ 'style-loader', 'css-loader', 'sass-loader', ],
+          },    
+          SASSRule,      
       ]
     },
-    plugins: [ new MiniCssExtractPlugin({ filename: 'mixy.css' }), ],
-    devtool: 'inline-source-map',
+    plugins: [  new MiniCssExtractPlugin({ filename: 'mixy.css' }), ],
+    externals: Externals
+}
+
+const MonacoConfiguration = {
+	entry: './src/monaco/index.js',
+  output: {
+    chunkFilename: '[name].bundle.js',
+    path: path.resolve(__dirname, 'public/dist/monaco'),
+    publicPath: '/dist/monaco/',
+    library: "monacolib"
+  },
+	module: {
+		rules: [
+      {
+        test: /\.d\.ts$/,
+        use: ['raw-loader']
+      },
+      JSRule, 
+      {
+        test: /\.css$/i,
+        use: [ 'style-loader', 'css-loader', 'sass-loader', ],
+      }, {
+        test: /\.ttf$/,
+        use: ['file-loader']
+      }
+    ]
+  },
+  plugins: [
+		new MonacoWebpackPlugin({
+			languages: ["typescript", "javascript", "css", "html"],
+		})
+  ],
+  externals: Externals
 }
 
 module.exports = [
     AppConfiguration,
-    MixyConfiguration
+    MixyConfiguration,
+    MonacoConfiguration
 ].concat(require('./kiss/webpack.config'));
