@@ -28,16 +28,6 @@ const JSRule = {
   }
 };
 
-const SASSRule = {
-  test: /\.s?[ac]ss$/i,
-  exclude: /view.*/,
-  use: [
-    MiniCssExtractPlugin.loader,
-    { loader: 'css-loader' },
-    { loader: 'sass-loader', options: { sourceMap: true } },
-  ]
-};
-
 const AppConfiguration = {
     entry: './src/app/app.js',
     output: {
@@ -50,7 +40,15 @@ const AppConfiguration = {
     module: {
       rules: [
         JSRule,
-        SASSRule,
+        {
+          test: /\.s?[ac]ss$/i,
+          exclude: /view.*/,
+          use: [
+            MiniCssExtractPlugin.loader,
+            { loader: 'css-loader' },
+            { loader: 'sass-loader', options: { sourceMap: true } },
+          ]
+        },
         {
           test: /view.*\.s?[ac]ss$/i,
           use: [ 'style-loader', 'css-loader', 'sass-loader' ],
@@ -74,13 +72,12 @@ const MixyConfiguration = {
         rules: [
           JSRule,
           {
-            test: /\.css$/i,
-            use: [ 'style-loader', 'css-loader', 'sass-loader', ],
-          },    
-          SASSRule,      
+            test: /\.s?[ac]ss$/i,
+            use: [ 'style-loader', 'css-loader', 'sass-loader' ],
+          },
       ]
     },
-    plugins: [  new MiniCssExtractPlugin({ filename: 'mixy.css' }), ],
+    plugins: [  ],
     externals: Externals
 }
 

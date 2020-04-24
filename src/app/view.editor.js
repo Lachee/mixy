@@ -9,17 +9,23 @@ $(document).ready(async () => {
         headers: { 'Content-Type': 'application/json' },
     });
 
+    //Get the JSON data
     const loadedScreenData = await loadedScreenResponse.json();
     const container = $("#monaco-editor").get(0);
     const editor = new MonacoEditor(container);
     editor.setValues({ html: loadedScreenData.data.html, js: loadedScreenData.data.js, css: loadedScreenData.data.css });
     
+    //refresh the loader
+    refreshPreview();
+
+    //Update the tabs
     editor.on("languageChanged", (language, model) => {
         console.log(language, model);
-        $("#monaco-column .tabs li").removeClass("is-active");
-        $("#monaco-column .tabs li[data-lang="+language+"]").addClass("is-active");
+        $("#monaco-tabs.tabs li").removeClass("is-active");
+        $("#monaco-tabs.tabs li[data-lang="+language+"]").addClass("is-active");
     });
 
+    //Save the document
     editor.on("save", async (models) => {
         console.log("save models", models);
 
@@ -34,15 +40,22 @@ $(document).ready(async () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(content)
         });
+
+        refreshPreview();
     });
 
     editor.on("run", () => {
-        //TODO: refresh the stuff
     });
 
-
-    $("#monaco-column .tabs a").click((data) => {
+    $("#monaco-tabs.tabs a").click((data) => {
+        console.log("click");
         let $parent = $(data.target).parent();
         editor.setLanguage($parent.data("lang"));
-    });    
+    });
+    
+
+    function refreshPreview() {
+        $(".iframe-wrapper .preview").fadeOut();
+        $(".iframe-wrapper .preview").get(0).src = '/player/24f067c8-853a-11ea-bc55-0242ac130003/';
+    }
 });
