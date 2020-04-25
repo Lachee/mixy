@@ -4,6 +4,8 @@ const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
 const DeclarationBundlerPlugin = require('declaration-bundler-webpack-plugin');
+const WrapperPlugin = require('wrapper-webpack-plugin');
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 const Externals = {  
   'mixy/mixy': 'mixlib',
@@ -107,14 +109,28 @@ const MonacoConfiguration = {
   },
   plugins: [
 		new MonacoWebpackPlugin({
-			languages: ["typescript", "javascript", "css", "html"],
+			languages: ["typescript", "javascript", "css", "html", "json"],
 		})
   ],
   externals: Externals
 }
 
+/*
+const TweenConfiguration = {
+  entry: '@tweenjs/tween.js',
+  output: {    
+    filename: 'tweenjs.js',
+    path: path.resolve(__dirname, 'public/dist/'),
+    publicPath: '/dist/',
+    library: 'createjs',
+    libraryExport: 'default'
+  },
+}
+*/
+
+
 module.exports = [
     AppConfiguration,
     MixyConfiguration,
-    MonacoConfiguration
+    MonacoConfiguration,
 ].concat(require('./kiss/webpack.config'));

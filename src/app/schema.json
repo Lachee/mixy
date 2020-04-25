@@ -1,0 +1,6 @@
+{
+    "description": "schema editor",
+    "properties": {
+        "description": "string"
+    }
+}

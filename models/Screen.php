@@ -15,14 +15,15 @@ class Screen extends ActiveRecord {
     public $html;
     public $js;
     public $css;
+    public $json;
 
     public static function getSchemaProperties($options = []) {
         return [
-            'uuid'  => new StringProperty('UUID of the screen'),
-            'html'  => new StringProperty('HTML code of the screen'),
-            'js'    => new StringProperty('JS code of the screen'),
-            'css'   => new StringProperty('CSS code of the screen'),
-
+            'uuid'      => new StringProperty('UUID of the screen'),
+            'html'      => new StringProperty('HTML code of the screen'),
+            'js'        => new StringProperty('JS code of the screen'),
+            'css'       => new StringProperty('CSS code of the screen'),
+            'json'      => new StringProperty('Schema of the properties'),
         ];
     }
 

@@ -32,6 +32,8 @@ class ScreenRoute extends Route {
             $screen->js = $body['js'];
         if(isset($body['css']))
             $screen->css = $body['css'];
+        if(isset($body['json']))
+            $screen->json = $body['json'];
         
         $screen->save();
         return $screen;

@@ -12,8 +12,8 @@ import EventEmitter from 'events';
 export class MonacoEditor extends EventEmitter{
 
 	#editor = null;
-	#languageModels = { 'js': {}, 'css': {}, 'html': {}};
-	#languageStates = { 'js': {}, 'css': {}, 'html': {}};
+	#languageModels = { 'js': {}, 'css': {}, 'html': {}, 'json': {}};
+	#languageStates = { 'js': {}, 'css': {}, 'html': {}, 'json': {}};
 	#currentLanguage = 'js';
 
 	constructor(container) {
@@ -31,6 +31,7 @@ export class MonacoEditor extends EventEmitter{
 			target: monaco.languages.typescript.ScriptTarget.ES6,
 			allowNonTsExtensions: true,
 			allowJs: true,
+			libs: [ '@tweenjs/tween.js']
 		});
 
 		// Import the types from the file
@@ -39,7 +40,7 @@ export class MonacoEditor extends EventEmitter{
 		// Create the monaco this.#editor
 		this.#editor = monaco.editor.create(
 			container,
-			{ theme: 'vs-dark' }
+			{ theme: 'vs-dark', automaticLayout: true }
 		);
 
 		// Create a custom action to switch between stuff
@@ -78,8 +79,19 @@ export class MonacoEditor extends EventEmitter{
 			contextMenuGroupId: 'navigation',	
 			contextMenuOrder: 1.5,
 			run: function(ed) { self.#changeLanguage('css'); }
+		});		
+		this.#editor.addAction({
+			id: 'mixy.language.switch.json',
+			label: 'Go to JSON Schema',	
+			keybindings: [
+				monaco.KeyMod.chord(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_L)
+			],
+			precondition: null,
+			keybindingContext: null,	
+			contextMenuGroupId: 'navigation',	
+			contextMenuOrder: 1.5,
+			run: function(ed) { self.#changeLanguage('json'); }
 		});
-
 		this.#editor.addAction({
 			id: 'mixy.save',
 			label: 'Save',	
@@ -93,27 +105,63 @@ export class MonacoEditor extends EventEmitter{
 			run: function(ed) {  self.emit("save", self.#languageModels); }
 		});
 		this.#editor.addAction({
-			id: 'mixy.save.run',
-			label: 'Save & Run',	
+			id: 'mixy.run',
+			label: 'Reload Preview',	
 			keybindings: [
-				monaco.KeyMod.chord(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_H)
+				monaco.KeyMod.chord(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_R)
 			],
 			precondition: null,
 			keybindingContext: null,	
 			contextMenuGroupId: null,	
 			contextMenuOrder: 1.5,
-			run: function(ed) { self.emit("save", self.#languageModels); self.emit('run'); }
+			run: function(ed) { self.emit('run'); }
 		});
 
 		//setup the languages
-		this.#languageModels.js = monaco.editor.createModel('var success = mixy.mixerLogin();\nalert(success);','javascript');
-		this.#languageModels.css = monaco.editor.createModel( '.container {\n}', 'css' );
-		this.#languageModels.html = monaco.editor.createModel(  '<div class="container">\n<!-- stuff here -->\n</div>', 'html' );
+		this.#languageModels.js = monaco.editor.createModel(`
+const size = 100;
+const speed = 1000;
+
+// data tweening
+createjs.Ticker.setFPS(60);
+createjs.Tween.get({opacity:0,x:0}, {loop:true, onChange:render})
+  .to({x:0,         y:0         }, 0, createjs.Ease.bounceOut)
+  .to({x:0,         y:1080-size }, speed, createjs.Ease.bounceOut)
+  .to({x:1920-size, y:1080-size }, speed, createjs.Ease.bounceOut)
+  .to({x:1920-size, y:0         }, speed, createjs.Ease.bounceOut)
+  .to({x:0,         y:0         }, speed, createjs.Ease.bounceOut);
+
+function render(event){
+  const avatar = document.getElementById('ball');
+  var data = event.currentTarget.target;
+  avatar.style.transform = \`translateX(\${data.x}px) translateY(\${data.y}px)\`;
+}
+`,'javascript');
+
+		this.#languageModels.css = monaco.editor.createModel(`
+#ball { 
+	width: 100px; 
+	height: 100px; 
+	background: #00d1b2;
+	position: absolute;
+	border-radius: 100%;
+}`, 'css' );
+		this.#languageModels.html = monaco.editor.createModel('<div id="ball"></div>', 'html' );
+		this.#languageModels.json = monaco.editor.createModel('{\n\n}', 'json' );
 
 		//set the initial model to JS
 		this.#editor.setModel(this.#languageModels.js);
 	}
 
+	/** Sets the schema suggestions for JSON */
+	async setJsonSuggestions(schema) {
+		compile = await import(/* webpackChunkName: "jstt" */ "json-schema-to-typescript");
+		console.log("COmpile:", compile);
+
+		ts = await compile(schema, 'settings');		
+		console.log(schema, "=>", ts);
+		monaco.languages.typescript.javascriptDefaults.addExtraLib(ts, 'js-schema.d.ts');
+	}
 		
 	/** Sets a language */
 	setLanguage(language) {
@@ -136,6 +184,11 @@ export class MonacoEditor extends EventEmitter{
 		for(let language in codes) {
 			this.setValue(language, codes[language]);
 		}
+	}
+
+	/** Gets the value of a language */
+	getValue(language) {
+		return this.#languageModels[language].getValue();
 	}
 
 	/** Triggers a Command Pallette action */

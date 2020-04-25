@@ -1,18 +1,3 @@
 @charset "utf-8";
 
 @import '../../kiss/src/bulma/bulma.scss';
-
-$previewScale: 0.5;
-$previewWidth: 1920;
-$previewHeight: 1080;
-
-.iframe-wrapper {
-    width: ($previewWidth * $previewScale) + 0px;
-    height: ($previewHeight * $previewScale) + 0px;
-    padding: 0;
-}
-.iframe-wrapper .preview{ 
-    width: $previewWidth + 0px;
-    height: $previewHeight + 0px;
-    transform: translateX(-($previewWidth / 2) + 0px) translateY( -($previewHeight/2) + 0px) scale($previewScale) translateX(($previewWidth / 2) + 0px) translateY(($previewHeight/2) + 0px);
-}

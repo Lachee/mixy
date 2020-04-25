@@ -1,8 +1,12 @@
+import './view.editor.scss';
 import { MonacoEditor } from "../monaco/index";
+import  GenerateSchema   from 'generate-schema';
 
 
 $(document).ready(async () => {
-    
+    const $iframe = $(".iframe-wrapper .preview");
+    const $monaco = $("#monaco-editor");
+
     //Load the data
     let loadedScreenResponse = await fetch('/api/screen/24f067c8-853a-11ea-bc55-0242ac130003', {
         method: 'GET',
@@ -11,9 +15,9 @@ $(document).ready(async () => {
 
     //Get the JSON data
     const loadedScreenData = await loadedScreenResponse.json();
-    const container = $("#monaco-editor").get(0);
+    const container = $monaco.get(0);
     const editor = new MonacoEditor(container);
-    editor.setValues({ html: loadedScreenData.data.html, js: loadedScreenData.data.js, css: loadedScreenData.data.css });
+    editor.setValues({ html: loadedScreenData.data.html, js: loadedScreenData.data.js, css: loadedScreenData.data.css, json: loadedScreenData.data.json });
     
     //refresh the loader
     refreshPreview();
@@ -33,6 +37,7 @@ $(document).ready(async () => {
             html: models.html.getValue(),
             css: models.css.getValue(),
             js: models.js.getValue(),
+            json: models.json.getValue(),
         }
 
         await fetch('/api/screen/24f067c8-853a-11ea-bc55-0242ac130003', {
@@ -42,20 +47,56 @@ $(document).ready(async () => {
         });
 
         refreshPreview();
+        generateSchema();
     });
 
+    //Just refresh the preview
     editor.on("run", () => {
+        refreshPreview();
+        generateSchema();
     });
 
+    //Tab Logic
     $("#monaco-tabs.tabs a").click((data) => {
         console.log("click");
         let $parent = $(data.target).parent();
         editor.setLanguage($parent.data("lang"));
     });
     
+    function generateSchema() {
+        let json = editor.getValue('json');
+        if (json != null) {
+            let obj = JSON.parse(json);
+            let schema = GenerateSchema.json('Settings', obj);
+            console.log("schema", schema);
+        }
+    }
+
+    //Resize Logic
+    window.addEventListener('resize', () => { console.log("resize"); resizePreview(); });
+    function resizePreview() {
+
+        const width = parseInt($monaco.css('width'), 10);
+        
+        let scale = width / 1920.0;
+        let height = 1080.0*scale;
+        $monaco.css('height', height);
+
+        $iframe.parent().css({ 
+            width: width,
+            height: height,
+        });
+        $iframe.css('transform', `scale(${scale})`);
+        console.log(scale);
+    }
 
     function refreshPreview() {
-        $(".iframe-wrapper .preview").fadeOut();
-        $(".iframe-wrapper .preview").get(0).src = '/player/24f067c8-853a-11ea-bc55-0242ac130003/';
+
+        $iframe.fadeOut();
+        $iframe.get(0).src = '/player/24f067c8-853a-11ea-bc55-0242ac130003/';
+        $iframe.on("load", () => {
+            $iframe.fadeIn();
+            resizePreview();
+        });
     }
 });

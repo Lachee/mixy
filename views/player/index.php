@@ -35,6 +35,8 @@ use kiss\Kiss;
         
         <!-- Dependencies -->
         <script src="/dist/mixy.js"></script>
+        <script src="https://code.createjs.com/1.0.0/easeljs.min.js"></script>
+        <script src="https://code.createjs.com/1.0.0/tweenjs.min.js"></script>
 
         <!-- App -->
         <!--
@@ -45,7 +47,15 @@ use kiss\Kiss;
             window._alert = window.alert;
             window.alert = function(alert) { console.log("ALERT", alert); };
         </script>
-        <style>            
+        <style>
+            body { 
+                background: transparent; 
+                padding: 0;
+                margin: 0; 
+                overflow: hidden; 
+                width: 1920px;
+                height: 1080px;
+            }
             <?= $css ?>
         </style>
     </head>
