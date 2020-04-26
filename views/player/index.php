@@ -63,6 +63,7 @@ use kiss\Kiss;
         <?= $html ?>
     </body>
     <script>
+        let options = <?= json_encode($json) ?>;
         (function() { <?= $js ?> })();
     </script>
 </html>

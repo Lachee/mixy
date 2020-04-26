@@ -3,6 +3,7 @@ import { MonacoEditor } from "../monaco/index";
 import  GenerateSchema   from 'generate-schema';
 
 
+
 $(document).ready(async () => {
     const $iframe = $(".iframe-wrapper .preview");
     const $monaco = $("#monaco-editor");
@@ -24,14 +25,12 @@ $(document).ready(async () => {
 
     //Update the tabs
     editor.on("languageChanged", (language, model) => {
-        console.log(language, model);
         $("#monaco-tabs.tabs li").removeClass("is-active");
         $("#monaco-tabs.tabs li[data-lang="+language+"]").addClass("is-active");
     });
 
     //Save the document
     editor.on("save", async (models) => {
-        console.log("save models", models);
 
         let content = {
             html: models.html.getValue(),
@@ -46,6 +45,7 @@ $(document).ready(async () => {
             body: JSON.stringify(content)
         });
 
+        console.log("Content Saved");
         refreshPreview();
         generateSchema();
     });
@@ -58,7 +58,6 @@ $(document).ready(async () => {
 
     //Tab Logic
     $("#monaco-tabs.tabs a").click((data) => {
-        console.log("click");
         let $parent = $(data.target).parent();
         editor.setLanguage($parent.data("lang"));
     });
@@ -67,8 +66,8 @@ $(document).ready(async () => {
         let json = editor.getValue('json');
         if (json != null) {
             let obj = JSON.parse(json);
-            let schema = GenerateSchema.json('Settings', obj);
-            console.log("schema", schema);
+            let schema = GenerateSchema.json('Schema', obj);
+            editor.setJsonSuggestions(schema);
         }
     }
 
@@ -86,8 +85,8 @@ $(document).ready(async () => {
             width: width,
             height: height,
         });
+        
         $iframe.css('transform', `scale(${scale})`);
-        console.log(scale);
     }
 
     function refreshPreview() {

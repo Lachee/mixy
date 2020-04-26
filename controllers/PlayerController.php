@@ -24,8 +24,9 @@ class PlayerController extends MixyController {
     function actionIndex() {
         $screen = $this->getScreen();
         return $this->render('index', [
-            'html' => $screen->html,
-            'css' => $screen->css,
+            'json' => $screen->getJsonDefaults(),
+            'html' => $screen->compileHTML(),
+            'css' => $screen->compileCSS(),
             'js' => $screen->js,
          ]);
     }

@@ -2,13 +2,20 @@
 use kiss\helpers\HTML;
 $fullWidth = true;
 ?>
+<script>
+    const prettier = {
+        format(code, options) { 
+            return code;
+        }
+    }
+</script>
 <div class="row">
     <div id="monaco-tabs" class="tabs is-small">
         <ul>
             <li data-lang="html" ><a>HTML</a></li>
             <li data-lang="js" class="is-active"><a>JavaScript</a></li>
             <li data-lang="css" ><a>CSS</a></li>
-            <li data-lang="json" ><a>Default Settings</a></li>
+            <li data-lang="json" ><a>Settings</a></li>
         </ul>
     </div>
 </div>

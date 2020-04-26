@@ -1,7 +1,7 @@
 import './bulma-mod.css';
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";	//Imports Monaco
-import util from 'util';
 import EventEmitter from 'events';
+import { compile } from 'json-schema-to-typescript';
 
 /** Wrapper around the monaco editor that provides a clean default enviroment
  * events:
@@ -15,6 +15,7 @@ export class MonacoEditor extends EventEmitter{
 	#languageModels = { 'js': {}, 'css': {}, 'html': {}, 'json': {}};
 	#languageStates = { 'js': {}, 'css': {}, 'html': {}, 'json': {}};
 	#currentLanguage = 'js';
+	#settingsDefinition = null;
 
 	constructor(container) {
 		super();
@@ -155,12 +156,21 @@ function render(event){
 
 	/** Sets the schema suggestions for JSON */
 	async setJsonSuggestions(schema) {
-		compile = await import(/* webpackChunkName: "jstt" */ "json-schema-to-typescript");
-		console.log("COmpile:", compile);
+		
+		//Compile the TS and modify it so monaco can use it.
+		let ts = await compile(schema, 'Schema');		
+		ts = ts.replace("export interface", "declare class");	//Monaco wants classes
+		ts = ts + "\ndeclare let options : Schema;\n";		//I want a static variable called settings
 
-		ts = await compile(schema, 'settings');		
-		console.log(schema, "=>", ts);
-		monaco.languages.typescript.javascriptDefaults.addExtraLib(ts, 'js-schema.d.ts');
+		//Dispose of the previous settings
+		if (this.#settingsDefinition != null) {
+			this.#settingsDefinition.dispose();
+		}
+
+		//Apply to monaco
+		setTimeout(() => {
+			this.#settingsDefinition = monaco.languages.typescript.javascriptDefaults.addExtraLib(ts,  Date.now() + '-js-schema.d.ts');
+		}, 500);
 	}
 		
 	/** Sets a language */
@@ -175,7 +185,6 @@ function render(event){
 
 	/** Sets the code for a language */
 	setValue(language, code) {
-		console.log("load", language, code);
 		this.#languageModels[language].setValue(code);
 	}
 
@@ -210,7 +219,6 @@ function render(event){
 		//Remeber our new langauge
 		this.#currentLanguage = language;
 		this.emit("languageChanged", language, this.#languageModels[language]);
-
 	}
 
 

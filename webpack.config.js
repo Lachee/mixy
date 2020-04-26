@@ -109,10 +109,13 @@ const MonacoConfiguration = {
   },
   plugins: [
 		new MonacoWebpackPlugin({
-			languages: ["typescript", "javascript", "css", "html", "json"],
+			languages: ["typescript", "javascript", "css", "html", "json" ],
 		})
   ],
-  externals: Externals
+  externals: {
+    "fs": "null",
+    "prettier": "prettier",
+  },
 }
 
 /*
