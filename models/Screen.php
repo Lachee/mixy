@@ -5,6 +5,7 @@ use kiss\db\ActiveQuery;
 use kiss\helpers\StringHelper;
 use kiss\schema\StringProperty;
 use Ramsey\Uuid\Uuid;
+use app\models\Configuration;
 
 class Screen extends ActiveRecord {
 
@@ -29,27 +30,19 @@ class Screen extends ActiveRecord {
         ];
     }
 
-    private function cleanJSON($arr) {
-
-        if (is_array($arr)) {
-            if (isset($arr['$default'])) 
-            {
-                return $arr['$default'];
-            } 
-            else
-            {
-                foreach($arr as $key => $value) {
-                    if (StringHelper::startsWith($key, '$')) continue;
-                    $arr[$key] = $this->cleanJSON($value);
-                }
-            }
-        }
-
-        return $arr;
+    /** Configures the screen
+     * @param Configuration $configuration
+     * @return Screen self
+     */
+    public function configure($configuration) {
+        $defaults = $this->getJsonDefaults();
+        $config = $configuration->getJson();
+        $this->_compiledDefaults = array_merge($defaults, $config);
+        return $this;
     }
 
     /** Decodes the Json data and prepares the defaults.
-     * @return string The resolved JSON array 
+     * @return array The resolved JSON array 
     */
     public function getJsonDefaults() {
         if ($this->_compiledDefaults !== null) return $this->_compiledDefaults;
@@ -94,6 +87,25 @@ class Screen extends ActiveRecord {
             else $output[$path.$key.$suffix] = $value;
         }
         return $output ;
+    }
+    
+    private function cleanJSON($arr) {
+
+        if (is_array($arr)) {
+            if (isset($arr['$default'])) 
+            {
+                return $arr['$default'];
+            } 
+            else
+            {
+                foreach($arr as $key => $value) {
+                    if (StringHelper::startsWith($key, '$')) continue;
+                    $arr[$key] = $this->cleanJSON($value);
+                }
+            }
+        }
+
+        return $arr;
     }
 
 }

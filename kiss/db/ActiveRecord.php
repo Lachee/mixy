@@ -121,9 +121,11 @@ class ActiveRecord extends BaseObject{
         //Update our ID
         $tableKeys = self::tableKey();
         if (is_string($tableKeys)) {
-            $this->{$tableKeys} = $result;
+            if ($result !== '0' || $this->{$tableKeys} == null)
+                $this->{$tableKeys} = $result;
         } else {            
-            $this->{$tableKeys[0]} = $result;
+            if ($result !== '0' || $this->{$tableKeys[0]} == null)
+                $this->{$tableKeys[0]} = $result;
         }
 
         //Return the last auto incremented id

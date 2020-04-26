@@ -1,7 +1,7 @@
 <?php
 use kiss\helpers\HTML;
 use kiss\Kiss;
-
+$theme = '';
 ?>
 <html>
     <head>

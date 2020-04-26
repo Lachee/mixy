@@ -10,6 +10,7 @@ use app\models\User;
 use kiss\Kiss;
 use Mixy;
 use Ramsey\Uuid\Uuid;
+use app\models\Configuration;
 
 class PlayerController extends MixyController {
     
@@ -22,20 +23,40 @@ class PlayerController extends MixyController {
     public static function getRouting() { return "/player/:uuid"; }
 
     function actionIndex() {
-        $screen = $this->getScreen();
+        /** @var Screen the screen */
+        $screen = null;
+
+        /** @var Configuration the config */
+        $configuration  = $this->getConfiguration();
+
+        //Find the screen based on teh config link, otherwise find it by the current uuid
+        if ($configuration != null) {
+            $screen = $configuration->getScreen()->one();
+        } else {
+            $screen = Screen::findByUuid($this->uuid)->one(); 
+        }
+
+        //404 if there is no screen matching
+        if ($screen == null || !($screen instanceof Screen))
+            throw new HttpException(HTTP::NOT_FOUND);
+
+        //Configure the screen
+        $screen->configure($configuration);
+
+        //Return the preview
         return $this->render('index', [
-            'json' => $screen->getJsonDefaults(),
-            'html' => $screen->compileHTML(),
-            'css' => $screen->compileCSS(),
-            'js' => $screen->js,
+            'json'  => $screen->getJsonDefaults(),
+            'html'  => $screen->compileHTML(),
+            'css'   => $screen->compileCSS(),
+            'js'    => $screen->js,
          ]);
     }
-    
-    /** @return Screen */
-    private function getScreen() {
-        $query = Screen::findByUuid($this->uuid);
+
+    /** @return Configuration */
+    private function getConfiguration() { 
+        $query = Configuration::findByUuid($this->uuid);
         $model = $query->one();
-        if ($model == null) throw new HttpException(HTTP::NOT_FOUND);
         return $model;
     }
+    
 }
