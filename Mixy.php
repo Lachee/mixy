@@ -22,10 +22,12 @@ class Mixy extends Kiss {
     protected function init() {
         parent::init();
 
-        //Find the user and update their internal cache.
-        /** @var User */
-        $this->user = User::findBySession()->one();
-        $i = $this->user;
+        if ($this->session != null) {
+            //Find the user and update their internal cache.
+            /** @var User */
+            $this->user = User::findBySession()->one();
+            $i = $this->user;
+        }
     }
 
 

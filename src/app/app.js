@@ -1,5 +1,7 @@
 import './page.scss';
 import '../mixy/mixy';
+export const TWEEN = require('@tweenjs/tween.js');
+
 export function test() { 
     console.log("yup");
 }

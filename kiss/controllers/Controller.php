@@ -167,10 +167,12 @@ class Controller extends Route {
             }
 
             //Perform the action
-            $response = $this->{$action}();
-            return Kiss::$app->respond($response);
-        }catch(Exception $e) {
-            return Response::exception($e);
+            $value = $this->{$action}();
+            $response = Kiss::$app->respond($value);
+            return $response;
+        }catch(\Exception $e) {
+            $response =  Response::exception($e);            
+            return $response;
         }
     }
 

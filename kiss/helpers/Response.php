@@ -26,6 +26,7 @@ class Response {
 
     /** Creates a new response to handle the exception. If the supplied mode is null, it will use the server's default. */
     public static function exception(Exception $exception, $status = HTTP::INTERNAL_SERVER_ERROR, $mode = null) {
+        $response = $status;
         if ($exception instanceof HttpException) return self::httpException($exception, $mode);
         return self::httpException(new HttpException($status, $exception), $mode);
     }
@@ -106,11 +107,15 @@ class Response {
     }
 
     /** Sets the response contents and returns the response itself. */
-    public function setContent($content, $type = null) {
-        $this->data = $content;
-        if ($type != null) $this->setContentType($type);
+    public function setContent($content, $contentType = null) {
+        $this->content = $content;
+        $this->contentType = $contentType ?? $this->contentType;
         return $this;
     }
+
+    /** @return string gets the content */
+    public function getContent() { return $this->content; }
+
 
     /** Executes the response, setting the current page's response code & headers, echoing out the contents and then exiting. */
     public function respond() {

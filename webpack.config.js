@@ -4,6 +4,8 @@ const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
 const DeclarationBundlerPlugin = require('declaration-bundler-webpack-plugin');
+const WrapperPlugin = require('wrapper-webpack-plugin');
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 const Externals = {  
   'mixy/mixy': 'mixlib',
@@ -28,16 +30,6 @@ const JSRule = {
   }
 };
 
-const SASSRule = {
-  test: /\.s?[ac]ss$/i,
-  exclude: /view.*/,
-  use: [
-    MiniCssExtractPlugin.loader,
-    { loader: 'css-loader' },
-    { loader: 'sass-loader', options: { sourceMap: true } },
-  ]
-};
-
 const AppConfiguration = {
     entry: './src/app/app.js',
     output: {
@@ -50,7 +42,15 @@ const AppConfiguration = {
     module: {
       rules: [
         JSRule,
-        SASSRule,
+        {
+          test: /\.s?[ac]ss$/i,
+          exclude: /view.*/,
+          use: [
+            MiniCssExtractPlugin.loader,
+            { loader: 'css-loader' },
+            { loader: 'sass-loader', options: { sourceMap: true } },
+          ]
+        },
         {
           test: /view.*\.s?[ac]ss$/i,
           use: [ 'style-loader', 'css-loader', 'sass-loader' ],
@@ -74,13 +74,12 @@ const MixyConfiguration = {
         rules: [
           JSRule,
           {
-            test: /\.css$/i,
-            use: [ 'style-loader', 'css-loader', 'sass-loader', ],
-          },    
-          SASSRule,      
+            test: /\.s?[ac]ss$/i,
+            use: [ 'style-loader', 'css-loader', 'sass-loader' ],
+          },
       ]
     },
-    plugins: [  new MiniCssExtractPlugin({ filename: 'mixy.css' }), ],
+    plugins: [  ],
     externals: Externals
 }
 
@@ -110,14 +109,31 @@ const MonacoConfiguration = {
   },
   plugins: [
 		new MonacoWebpackPlugin({
-			languages: ["typescript", "javascript", "css", "html"],
+			languages: ["typescript", "javascript", "css", "html", "json" ],
 		})
   ],
-  externals: Externals
+  externals: {
+    "fs": "null",
+    "prettier": "prettier",
+  },
 }
+
+/*
+const TweenConfiguration = {
+  entry: '@tweenjs/tween.js',
+  output: {    
+    filename: 'tweenjs.js',
+    path: path.resolve(__dirname, 'public/dist/'),
+    publicPath: '/dist/',
+    library: 'createjs',
+    libraryExport: 'default'
+  },
+}
+*/
+
 
 module.exports = [
     AppConfiguration,
     MixyConfiguration,
-    MonacoConfiguration
+    MonacoConfiguration,
 ].concat(require('./kiss/webpack.config'));

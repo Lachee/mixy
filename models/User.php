@@ -5,6 +5,7 @@ use kiss\exception\NotYetImplementedException;
 use kiss\db\ActiveQuery;
 use app\components\mixer\MixerUser;
 use kiss\exception\ArgumentException;
+use kiss\exception\InvalidOperationException;
 use kiss\Kiss;
 use kiss\models\BaseObject;
 use kiss\models\OAuthContainer;
@@ -67,8 +68,11 @@ class User extends ActiveRecord {
     public static function findByEmail($email) {
         return self::find()->where([ 'email', $email ]);
     }
-    /** @return ActiveQuery|User finds a user using the current session data. */
+    /** @return ActiveQuery|User|null finds a user using the current session data. */
     public static function findBySession() {        
+        if (Mixy::$app->session == null)
+            throw new InvalidOperationException("Cannot find by session because there is currently no session available.");
+        
         $sub = Mixy::$app->session->getClaim('sub', 'n/a');
         $key = Mixy::$app->session->getClaim('key', 'n/a');
         return self::find()->where([ ['uuid', $sub ], ['accessKey', $key] ]);

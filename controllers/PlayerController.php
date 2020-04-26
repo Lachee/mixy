@@ -11,25 +11,31 @@ use kiss\Kiss;
 use Mixy;
 use Ramsey\Uuid\Uuid;
 
-class EditorController extends MixyController {
+class PlayerController extends MixyController {
+    
+    protected $headerFile = null;
+    protected $contentFile = null;
+    protected $footerFile = null;
 
     public $uuid;
-
-    public static function getRouting() { return "/editor/:uuid"; }
+    
+    public static function getRouting() { return "/player/:uuid"; }
 
     function actionIndex() {
         $screen = $this->getScreen();
-        return $this->render('index', [ 
-            'fullWidth' => true,
-            'screen'  => $screen
-        ]);
+        return $this->render('index', [
+            'json' => $screen->getJsonDefaults(),
+            'html' => $screen->compileHTML(),
+            'css' => $screen->compileCSS(),
+            'js' => $screen->js,
+         ]);
     }
     
     /** @return Screen */
     private function getScreen() {
         $query = Screen::findByUuid($this->uuid);
         $model = $query->one();
-        if ($model == null) throw new HttpException(HTTP::NOT_FOUND, 'aah');
+        if ($model == null) throw new HttpException(HTTP::NOT_FOUND);
         return $model;
     }
 }

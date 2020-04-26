@@ -45,9 +45,10 @@ try {
     }
 
     //Attempt to get the event
-    return $controller->action($endpoint);
+    $response = $controller->action($endpoint);
+    return Kiss::$app->respond($response);
 } catch(HttpException $exception) {
     return Kiss::$app->respond($exception);
-} catch(\Exception $exception) {
+} catch(\Throwable $exception) {
     return Kiss::$app->respond(new HttpException(HTTP::INTERNAL_SERVER_ERROR, $exception));
 }

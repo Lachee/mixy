@@ -39,7 +39,7 @@ class Property extends BaseObject implements JsonSerializable {
             return [ '$ref' => $this->ref ];
         }
         
-        if ($this->options != null && count($this->options) == 0) {
+        if ($this->options != null && (is_countable($this->options) && count($this->options) == 0)) {
             unset($props['options']);
         }
 

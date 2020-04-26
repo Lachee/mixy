@@ -23,7 +23,8 @@ class MixyController extends Controller {
             }
         }
         
-        return parent::action($endpoint);
+        $response = parent::action($endpoint);
+        return $response;
     }
 
     public function render($action, $options = []) {

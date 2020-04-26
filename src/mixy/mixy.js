@@ -1,4 +1,4 @@
-import './mixy.css';        //Page styling
+import './mixy.scss';        //Page styling
 import './oAuthPopup.js';   //Library that adds "document.createModal"
 
 import { ShortCodeExpireError, ShortCodeAccessDeniedError, OAuthClient }  from '@mixer/shortcode-oauth';
@@ -16,6 +16,7 @@ export class Mixy {
     /** Attempts to perform a login */
     async mixerLogin() {
 
+        const self = this;
         let modal = this.#getShortCodeModal();
         modal.show();
 
@@ -23,7 +24,7 @@ export class Mixy {
             try 
             {
                 //Wait for the code
-                let shortCode = await this.#mixerOAuthClient.getCode();
+                let shortCode = await self.#mixerOAuthClient.getCode();
                 modal.code(shortCode.code);
                 modal.openWindow();
 
@@ -70,9 +71,7 @@ export class Mixy {
     #getShortCodeModal() {
         if (this.#shortCodeModal != null) return this.#shortCodeModal;
 
-        var document=document || {};
-
-        //@ts-ignore
+        const self = this;
         this.#shortCodeModal = document.createModal(`
             <section class="hero is-primary">
             <div class="hero-body">
@@ -92,15 +91,13 @@ export class Mixy {
 
         //Hook the code function up
         this.#shortCodeModal.code = function(val = undefined) {
-            if (val === undefined) return  $(this.#shortCodeModal).find('input[name=shortcode]').val();
-            return $(this.#shortCodeModal).find('input[name=shortcode]').val(val);
+            if (val === undefined) return  $(self.#shortCodeModal).find('input[name=shortcode]').val();
+            return $(self.#shortCodeModal).find('input[name=shortcode]').val(val);
         };
 
         //Create a functin to open window
         this.#shortCodeModal.openWindow = function() {
-
-            //@ts-ignore
-            this.#shortCodeModal.oauthWindow = window.openOAuthWindow('https://mixer.com/go?code=' + this.#shortCodeModal.code(), { 
+            self.#shortCodeModal.oauthWindow = window.openOAuthWindow('https://mixer.com/go?code=' + self.#shortCodeModal.code(), { 
                 windowOptions: {
                     center: true,
                     width: 560,
@@ -110,14 +107,14 @@ export class Mixy {
         }
 
         this.#shortCodeModal.closeWindow = function() {
-            if (this.#shortCodeModal.oauthWindow) 
-            this.#shortCodeModal.oauthWindow.close();
+            if (self.#shortCodeModal.oauthWindow) 
+            self.#shortCodeModal.oauthWindow.close();
         }
 
         //Hook into the button
         $(this.#shortCodeModal).find('.oauth').click((e) => {
             e.preventDefault();
-            this.#shortCodeModal.openWindow();
+            self.#shortCodeModal.openWindow();
         });
 
         return this.#shortCodeModal;
