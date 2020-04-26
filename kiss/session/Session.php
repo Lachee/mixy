@@ -71,7 +71,7 @@ abstract class Session extends BaseObject {
         
 
         //Store the JWT
-        HTTP::setCookie(self::JWT_COOKIE_NAME, $this->jwt, $this->claims->exp);
+        HTTP::setCookie(self::JWT_COOKIE_NAME, $this->jwt, $this->claims->exp, '/');
     }
 
     /** Gets the current session ID.
@@ -92,7 +92,7 @@ abstract class Session extends BaseObject {
             //Clear the cookie
             $this->claims   = null;
             $this->jwt      = null;
-            HTTP::setCookie(self::JWT_COOKIE_NAME, '', 10);
+            HTTP::setCookie(self::JWT_COOKIE_NAME, 'expire', -3600, '/');
         } 
         else 
         {

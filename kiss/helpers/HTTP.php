@@ -207,7 +207,7 @@ class HTTP {
     }
 
     /** Sets the HTTP cookie headers in response. */
-    public static function setCookie(string $name, string $value = "", int $expires = 0, string $path = "", string $domain = "", bool $secure = false, bool $httponly = false) {
+    public static function setCookie(string $name, string $value = "", int $expires = 0, string $path = "/", string $domain = "", bool $secure = false, bool $httponly = false) {
         self::$SET_COOKIES[$name] = [
             $value,
             $expires,
