@@ -86,7 +86,7 @@ class JWTProvider extends BaseObject {
             case self::ALGO_RS256:
             case self::ALGO_RS384:
             case self::ALGO_RS512:
-                $key = $this->privateKey;
+                $key = $this->publicKey;
                 break;
 
             default:
