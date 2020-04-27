@@ -1,5 +1,5 @@
 <?php
-namespace widget;
+namespace app\widget;
 
 use kiss\helpers\HTML;
 use kiss\Kiss;
