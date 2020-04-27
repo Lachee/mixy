@@ -1,7 +1,7 @@
 <?php namespace app\controllers;
 
 use app\components\mixer\Mixer;
-
+use app\models\Configuration;
 use kiss\exception\HttpException;
 use kiss\helpers\HTTP;
 use kiss\helpers\Response;
@@ -17,6 +17,21 @@ class ScreenController extends MixyController {
 
 
     function actionIndex() {
-        return $this->render('index', [ ]);
+        /** @var Configuration */
+        $config = Configuration::findByUuid($this->uuid)->one();
+        if ($config == null) throw new HttpException(HTTP::NOT_FOUND);
+
+        /** @var Screen */
+        $screen = $config->getScreen()->one();
+        if ($screen == null) throw new HttpException(HTTP::BAD_REQUEST, "Configuration no longer has a valid screen");
+
+        if (HTTP::hasPost()) {
+            
+        }
+
+        return $this->render('index', [
+            'config' => $config,
+            'screen' => $screen,
+         ]);
     }
 }

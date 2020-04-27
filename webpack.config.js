@@ -9,9 +9,7 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 const Externals = {  
   'mixy/mixy': 'mixlib',
-  '../mixy/mixy': 'mixlib',
   'monaco/index': 'monacolib',
-  '../monaco/index': 'monacolib',
 }
 
 const JSRule = {

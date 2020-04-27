@@ -41,6 +41,11 @@ class Screen extends ActiveRecord {
         return $this;
     }
 
+    /** @return array the JSON with the schema metadata */
+    public function getJson() {
+        return json_decode($this->json, true);
+    }
+
     /** Decodes the Json data and prepares the defaults.
      * @return array The resolved JSON array 
     */

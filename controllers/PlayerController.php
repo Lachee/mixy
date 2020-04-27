@@ -32,6 +32,7 @@ class PlayerController extends MixyController {
         //Find the screen based on teh config link, otherwise find it by the current uuid
         if ($configuration != null) {
             $screen = $configuration->getScreen()->one();
+            $screen->configure($configuration);
         } else {
             $screen = Screen::findByUuid($this->uuid)->one(); 
         }
@@ -39,9 +40,6 @@ class PlayerController extends MixyController {
         //404 if there is no screen matching
         if ($screen == null || !($screen instanceof Screen))
             throw new HttpException(HTTP::NOT_FOUND);
-
-        //Configure the screen
-        $screen->configure($configuration);
 
         //Return the preview
         return $this->render('index', [

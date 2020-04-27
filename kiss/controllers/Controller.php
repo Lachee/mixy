@@ -79,6 +79,13 @@ class Controller extends Route {
 
     /** Renders only the content */
     public function renderContent($action, $options = []) {
+        $options['_CONTROLLER'] = $this;
+        $filepath = $this->getContentViewPath($action) . ".php";
+        return $this->renderFile($filepath, $options);
+    }
+
+    /** @return string the path to the content */
+    private function getContentViewPath($action) {
         $name = $class = get_called_class();
         $path = '';
         
@@ -99,9 +106,7 @@ class Controller extends Route {
         if (empty($path))
             $path = '/main';
 
-        $options['_CONTROLLER'] = $this;
-        $filepath = (strpos($action, "@") === 0 ? $action : "@/views" . $path . "/" . $action) . ".php";
-        return $this->renderFile($filepath, $options);
+        return  (strpos($action, "@") === 0 ? $action : "@/views" . $path . "/" . $action);
     }
 
     /** Renders all the current js variables */
@@ -158,7 +163,7 @@ class Controller extends Route {
     }
 
     /** Performs the endpoint's action */
-    public function action($endpoint) {
+    public function action($endpoint, ...$args) {
         try {
             //Attempt to get the event
             $action = $this->getAction($endpoint);
@@ -166,14 +171,22 @@ class Controller extends Route {
                 throw new HttpException(HTTP::NOT_FOUND, 'endpoint could not be found.');
             }
 
+            //Define some JS actions
+            $this->registerJsVariable("CONTENT_PATH", $this->getContentViewPath($action), self::POS_START, 'const');
+
             //Perform the action
-            $value = $this->{$action}();
+            $value = $this->{$action}(...$args);
             $response = Kiss::$app->respond($value);
             return $response;
         }catch(\Exception $e) {
             $response =  Response::exception($e);            
             return $response;
         }
+    }
+
+    /** Renders the exception page*/
+    public function actionException($exception) {
+        return $this->renderException($exception);
     }
 
     /** Gets the action name */

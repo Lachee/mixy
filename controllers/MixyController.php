@@ -9,10 +9,10 @@ use Mixy;
 
 class MixyController extends Controller {
 
-    public function action($endpoint) {
+    public function action($endpoint, ...$args) {
         
         //Force a check on the mixer user, validating the oauth. We dont want to apply this rule to the /auth endpoint tho.
-        if (Mixy::$app->loggedIn() && $endpoint != '/auth') {
+        if (Mixy::$app->loggedIn() && $endpoint != '/auth' && $endpoint != 'exception') {
            try { 
                Mixy::$app->getUser()->getMixerUser();
             } catch(\Exception $ex) { 
@@ -23,7 +23,7 @@ class MixyController extends Controller {
             }
         }
         
-        $response = parent::action($endpoint);
+        $response = parent::action($endpoint, ...$args);
         return $response;
     }
 

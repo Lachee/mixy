@@ -2,7 +2,7 @@
 
 use kiss\helpers\HTML;
 use kiss\Kiss;
-$user = Mixy::$app->getUser()
+$user = Mixy::$app->getUser();
 ?>
 <!-- START NAV -->
 <nav class="navbar">

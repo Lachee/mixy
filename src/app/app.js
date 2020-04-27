@@ -1,10 +1,5 @@
 import './page.scss';
-import '../mixy/mixy';
-export const TWEEN = require('@tweenjs/tween.js');
-
-export function test() { 
-    console.log("yup");
-}
+import 'mixy/mixy';
 
 //Get the route and remove the first element
 let route = window.location.pathname.split('/'); route.shift();
@@ -14,8 +9,14 @@ let filename = route[0].trim();
 if (filename == "") filename = "app";
 
 //Load the current JS for the base route
-console.log('loading view file', "./view."+filename+".js");
-import(/* webpackChunkName: "view-" */ "./view."+filename+".js").catch(e => {});
+console.log('loading view file', "./views/"+filename+"/index.js");
+export let view;
+export const viewPromise = new Promise((resolve, reject) => {
+    import(/* webpackChunkName: "view-" */ "./views/"+filename+"/index.js").then(v => {
+        view = v;
+        resolve(v);
+    }).catch(e => reject(e));
+});
 
 //Apply "always" javascript
 $(document).ready(() => {

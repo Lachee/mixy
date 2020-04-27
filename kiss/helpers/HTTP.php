@@ -1,5 +1,8 @@
 <?php
 namespace kiss\helpers;
+
+use kiss\Kiss;
+
 class HTTP {
     const CONTINUE = 100;
     const SWITCHING_PROTOCOLS = 101;
@@ -179,6 +182,15 @@ class HTTP {
     
     /** @return bool if the doc has post. */
     public static function hasPost(){ return isset($_POST) && count($_POST) > 0; }
+
+    /** @return string the CSRF token in a tag */
+    public static function CSRF() {
+        $csrf = Kiss::$app->jwtProvider->encode([
+            
+        ]);
+
+        return "<input type='hidden' value='$csrf' />";
+    }
 
     /** An query paramaters passed with the request */
     public static function request($variable, $default = null, $filter = null) {

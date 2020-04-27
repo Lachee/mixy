@@ -45,8 +45,10 @@ class Response {
             case HTTP::CONTENT_TEXT_HTML:
                 try {
                     //Try to get the controller and execute the actionException on it
-                    $controller = BaseObject::new(Controller::class);
-                    $response = $controller->renderException($exception);
+                    $controllerClass = Kiss::$app->mainController;
+                    $controller = BaseObject::new(Kiss::$app->mainController);
+                    $response = $controller->action('exception', $exception);
+                    //$response = $controller->renderException($exception);
                     return self::html($exception->getStatus(), $response);
                 } catch(Exception $ex) { 
                     //An error occured, so we ill just use the default plain text handling

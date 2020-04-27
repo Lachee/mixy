@@ -1,5 +1,5 @@
-import './view.editor.scss';
-import { MonacoEditor } from "../monaco/index";
+import './index.scss';
+import { MonacoEditor } from "monaco/index";
 import  GenerateSchema   from 'generate-schema';
 
 

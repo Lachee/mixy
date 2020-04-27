@@ -22,6 +22,7 @@
    "homepage": "https://github.com/Lachee/mixy#readme",
    "dependencies": {
       "@fortawesome/fontawesome-pro": "^5.13.0",
+      "@json-editor/json-editor": "^2.2.0",
       "@mixer/interactive-node": "^3.0.1",
       "@mixer/shortcode-oauth": "^1.2.0",
       "@tweenjs/tween.js": "^18.5.0",
