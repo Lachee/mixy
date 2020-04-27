@@ -3,9 +3,9 @@
 
 use kiss\controllers\Controller;
 use kiss\helpers\HTML;
-use widget\Breadcrumb;
-use widget\Menu;
-use widget\Notification;
+use app\widget\Breadcrumb;
+use app\widget\Menu;
+use app\widget\Notification;
 
 ?>
 
