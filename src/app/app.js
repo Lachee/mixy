@@ -1,5 +1,5 @@
 import './page.scss';
-import 'mixy/mixy';
+import { Mixy } from 'mixy/mixy';
 
 //Get the route and remove the first element
 let route = window.location.pathname.split('/'); route.shift();
@@ -7,6 +7,8 @@ let route = window.location.pathname.split('/'); route.shift();
 //Join the route back with dots
 let filename = route[0].trim();
 if (filename == "") filename = "app";
+
+export let mixy = new Mixy();
 
 //Load the current JS for the base route
 console.log('loading view file', "./views/"+filename+"/index.js");
@@ -16,7 +18,7 @@ export const viewPromise = new Promise((resolve, reject) => {
         view = v;
         resolve(v);
     }).catch(e => reject(e));
-});
+}).catch(e => {});
 
 //Apply "always" javascript
 $(document).ready(() => {

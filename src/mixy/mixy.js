@@ -1,20 +1,29 @@
 import './mixy.scss';        //Page styling
 import './oAuthPopup.js';   //Library that adds "document.createModal"
 
+import {MixerClient} from './MixerClient.js';
 import { ShortCodeExpireError, ShortCodeAccessDeniedError, OAuthClient }  from '@mixer/shortcode-oauth';
+import EventEmitter from 'events';
 
-export class Mixy {
+/** Handles co */
+export class Mixy extends EventEmitter {
 
     /** OAuthClient used by the shortcode. Using experimental privates from babel */
     #mixerOAuthClient;
     #shortCodeModal;
+    #options;
+    #mixer;
 
     constructor(options) {
-        this.#mixerOAuthClient = new OAuthClient(options);
+        this.#options = options;
+        //this.#mixerOAuthClient = new OAuthClient(options);
     }
 
     /** Attempts to perform a login */
     async mixerLogin() {
+
+        if (!this.#mixerOAuthClient)
+        this.#mixerOAuthClient = new OAuthClient(this.#options);
 
         const self = this;
         let modal = this.#getShortCodeModal();
@@ -67,7 +76,6 @@ export class Mixy {
 
         return false;
     }
-
     #getShortCodeModal() {
         if (this.#shortCodeModal != null) return this.#shortCodeModal;
 
@@ -119,5 +127,10 @@ export class Mixy {
 
         return this.#shortCodeModal;
        
+    }
+
+    connect() {
+        this.#mixer = new MixerClient();
+        
     }
 }

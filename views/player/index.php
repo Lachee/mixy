@@ -28,21 +28,19 @@ $theme = '';
         <script src="https://cdn.jsdelivr.net/npm/@json-editor/json-editor@latest/dist/jsoneditor.min.js"></script>
 
         <!-- Webpacks -->
-        <!--
         <script src="/dist/kiss.js"></script>
         <link rel="stylesheet" href="/dist/kiss.css">
-        -->
         
         <!-- Dependencies -->
+        <script src="/dist/interactive.min.js"></script>
         <script src="/dist/mixy.js"></script>
         <script src="https://code.createjs.com/1.0.0/easeljs.min.js"></script>
         <script src="https://code.createjs.com/1.0.0/tweenjs.min.js"></script>
 
         <!-- App -->
-        <!--
-            <script src="/dist/app.js"></script>
-            <link rel="stylesheet" href="/dist/app.css">
-        -->
+        <script src="/dist/app.js"></script>
+        <link rel="stylesheet" href="/dist/app.css">
+        
         <script>
             window._alert = window.alert;
             window.alert = function(alert) { console.log("ALERT", alert); };

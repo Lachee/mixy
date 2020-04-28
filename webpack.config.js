@@ -6,6 +6,7 @@ const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
 const DeclarationBundlerPlugin = require('declaration-bundler-webpack-plugin');
 const WrapperPlugin = require('wrapper-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const nodeExternals = require('webpack-node-externals');
 
 const Externals = {  
   'mixy/mixy': 'mixlib',
@@ -77,7 +78,7 @@ const MixyConfiguration = {
           },
       ]
     },
-    plugins: [  ],
+    plugins: [ new CopyPlugin([{from: './node_modules/@mixer/interactive-node/dist/interactive.min.js', too: './public/dist/interactive.min.js'}])],
     externals: Externals
 }
 
@@ -116,6 +117,18 @@ const MonacoConfiguration = {
   },
 }
 
+const ServerConfiguration = {
+  target: 'node',
+  entry: './src/mixy-server/server.js',
+  output: {
+    path: path.resolve(__dirname, './'),
+    filename: 'server.js'
+  },
+  externals: [
+    nodeExternals()
+  ]
+};
+
 /*
 const TweenConfiguration = {
   entry: '@tweenjs/tween.js',
@@ -134,4 +147,5 @@ module.exports = [
     AppConfiguration,
     MixyConfiguration,
     MonacoConfiguration,
+    ServerConfiguration
 ].concat(require('./kiss/webpack.config'));

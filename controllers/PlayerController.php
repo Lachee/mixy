@@ -22,6 +22,7 @@ class PlayerController extends MixyController {
     
     public static function getRouting() { return "/player/:uuid"; }
 
+    //[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}
     function actionIndex() {
         /** @var Screen the screen */
         $screen = null;

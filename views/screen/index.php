@@ -3,6 +3,7 @@ use kiss\helpers\HTML;
 
 ?>
 
+<input type="text" class="input is-secret" value="potato"/>
 <div id="json-editor"></div>
 <script>
     $(document).ready(() => {

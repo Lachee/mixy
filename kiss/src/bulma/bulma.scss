@@ -32,3 +32,11 @@ $family-sans-serif: "Nunito", sans-serif;
 .has-background-transparent {
     background-color: transparent;
 }
+
+.is-secret {
+    filter: blur(5px);
+}
+
+.is-secret:focus {
+    filter: none;
+}
