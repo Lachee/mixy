@@ -18,24 +18,32 @@ class PlayerController extends MixyController {
     protected $contentFile = null;
     protected $footerFile = null;
 
-    public $uuid;
+    public $identifier;
     
-    public static function getRouting() { return "/player/:uuid"; }
+    public static function getRouting() { return "/player/:identifier"; }
 
     //[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}
     function actionIndex() {
         /** @var Screen the screen */
         $screen = null;
 
-        /** @var Configuration the config */
-        $configuration  = $this->getConfiguration();
 
-        //Find the screen based on teh config link, otherwise find it by the current uuid
-        if ($configuration != null) {
-            $screen = $configuration->getScreen()->one();
-            $screen->configure($configuration);
+        if (preg_match('/[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/', $this->identifier)) {
+            $screen = Screen::findByUuid($this->identifier)->one(); 
         } else {
-            $screen = Screen::findByUuid($this->uuid)->one(); 
+            $jwt    = Kiss::$app->jwtProvider->decode($this->identifier);
+            $user   = User::findByJWT($jwt);
+            if ($user == null) throw new HttpException(HTTP::FORBIDDEN, 'invalid JWT token');
+
+            /** @var Configuration */
+            $configuration = Configuration::findByJWT($jwt)->one();
+            if ($configuration == null) throw new HttpException(HTTP::NOT_FOUND);
+
+            /** @var Screen the screen */
+            $screen = $configuration->getScreen()->one();            
+            if ($screen == null) throw new HttpException(HTTP::NOT_FOUND);
+
+            $screen->configure($configuration);
         }
 
         //404 if there is no screen matching

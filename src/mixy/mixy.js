@@ -15,6 +15,7 @@ export class Mixy extends EventEmitter {
     #mixer;
 
     constructor(options) {
+        super();
         this.#options = options;
         //this.#mixerOAuthClient = new OAuthClient(options);
     }

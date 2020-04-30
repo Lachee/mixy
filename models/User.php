@@ -73,9 +73,23 @@ class User extends ActiveRecord {
         if (Mixy::$app->session == null)
             throw new InvalidOperationException("Cannot find by session because there is currently no session available.");
         
-        $sub = Mixy::$app->session->getClaim('sub', 'n/a');
-        $key = Mixy::$app->session->getClaim('key', 'n/a');
-        return self::find()->where([ ['uuid', $sub ], ['accessKey', $key] ]);
+        return self::findByJWT(Mixy::$app->session->getClaims());
+        //$sub = Mixy::$app->session->getClaim('sub', 'n/a');
+        //$key = Mixy::$app->session->getClaim('key', 'n/a');
+        //return self::find()->where([ ['uuid', $sub ], ['accessKey', $key] ]);
+    }
+
+    /** @return ActiveQuery|User|null finds a user by a JWT claim */
+    public static function findByJWT($jwt) {
+        $sub = ''; $key = '';
+        if (is_array($jwt)) {
+            $sub = $jwt['sub'];
+            $key = $jwt['key'];
+        } else {
+            $sub = $jwt->sub;
+            $key = $jwt->key;
+        }
+        return self::find()->where([ ['uuid', $sub ], [ 'accessKey', $key ] ]);
     }
 
     /** Updates values from a mixer user
