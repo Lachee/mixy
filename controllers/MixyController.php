@@ -29,8 +29,10 @@ class MixyController extends Controller {
 
     public function render($action, $options = []) {
         $mixyDefaults = [
-            'clientId'  => Kiss::$app->mixer->clientId,
-            'scopes'    => Kiss::$app->mixer->scopes,
+            'oAuth' => [
+                'clientId'  => Kiss::$app->mixer->clientId,
+                'scopes'    => Kiss::$app->mixer->scopes,
+            ],
         ];
 
         $this->registerJsVariable("mixy", "new mixlib.Mixy(" . json_encode($mixyDefaults) . ")", Controller::POS_END, 'const', false);

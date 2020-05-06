@@ -9,6 +9,8 @@ use Ramsey\Uuid\Uuid;
 
 class Configuration extends ActiveRecord {
 
+    const EXPIRY = 30 * 24 * 60 * 60;
+
     public static function tableName() { return '$configurations'; }
     
     public $id;
@@ -85,7 +87,7 @@ class Configuration extends ActiveRecord {
 
         //Encode using the user if available, otherwise encode using the standard provider
         if ($user != null) return $user->jwt($payload);
-        return Kiss::$app->jwtProvider->encode($payload);
+        return Kiss::$app->jwtProvider->encode($payload, self::EXPIRY);
     }
 
 

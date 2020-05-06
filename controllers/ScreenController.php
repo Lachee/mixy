@@ -11,6 +11,8 @@ use kiss\Kiss;
 use Mixy;
 use Ramsey\Uuid\Uuid;
 use app\models\Screen;
+use kiss\helpers\ArrayHelper;
+use kiss\helpers\HTML;
 
 class ScreenController extends MixyController {
     public $uuid;
@@ -34,9 +36,12 @@ class ScreenController extends MixyController {
             }
         }
 
+        $screenData = $screen->getJson();
+        $configData = ArrayHelper::merge($screenData, $config->getJson());
         return $this->render('index', [
-            'config' => $config,
-            'screen' => $screen,
+            'configData'    => $configData,
+            'defaultData'   => $screenData,
+            'viewUrl' => Kiss::$app->baseURL() .  HTML::href([ 'player/'.  $config->jwt(Mixy::$app->getUser()) . '/'])
          ]);
     }
 }

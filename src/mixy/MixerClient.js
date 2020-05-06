@@ -26,11 +26,19 @@ export class MixerClient extends EventEmitter {
         }
 
         this.websocket = new WebSocket(this.host);
-        this.ws.addEventListener('open', (e) => { this.emit('open', e); });
+        this.ws.addEventListener('open', (e) => { 
+            this.send('AUTH', { 'token': location.pathname.split('/')[2] });
+            this.emit('open', e); 
+        });
+
         this.ws.addEventListener('close', (e) => { this.emit('close', e); });
         this.ws.addEventListener('message', (e) => {
             this.emit('message', e);
         });
+    }
+
+    send(event, payload) {
+
     }
     
 }

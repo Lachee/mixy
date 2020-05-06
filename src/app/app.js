@@ -8,8 +8,6 @@ let route = window.location.pathname.split('/'); route.shift();
 let filename = route[0].trim();
 if (filename == "") filename = "app";
 
-export let mixy = new Mixy();
-
 //Load the current JS for the base route
 console.log('loading view file', "./views/"+filename+"/index.js");
 export let view;

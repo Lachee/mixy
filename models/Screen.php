@@ -6,6 +6,7 @@ use kiss\helpers\StringHelper;
 use kiss\schema\StringProperty;
 use Ramsey\Uuid\Uuid;
 use app\models\Configuration;
+use kiss\helpers\ArrayHelper;
 
 class Screen extends ActiveRecord {
 
@@ -37,7 +38,7 @@ class Screen extends ActiveRecord {
     public function configure($configuration) {
         $defaults = $this->getJsonDefaults();
         $config = $configuration->getJson();
-        $this->_compiledDefaults = array_merge($defaults, $config);
+        $this->_compiledDefaults = ArrayHelper::merge($defaults, $config);
         return $this;
     }
 

@@ -86,8 +86,8 @@ class User extends ActiveRecord {
             $sub = $jwt['sub'];
             $key = $jwt['key'];
         } else {
-            $sub = $jwt->sub;
-            $key = $jwt->key;
+            $sub = property_exists($jwt, 'sub') ? $jwt->sub : null;
+            $key = property_exists($jwt, 'key') ? $jwt->key : null;
         }
         return self::find()->where([ ['uuid', $sub ], [ 'accessKey', $key ] ]);
     }

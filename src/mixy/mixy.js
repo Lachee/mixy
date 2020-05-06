@@ -11,23 +11,27 @@ export class Mixy extends EventEmitter {
     /** OAuthClient used by the shortcode. Using experimental privates from babel */
     #mixerOAuthClient;
     #shortCodeModal;
-    #options;
+    opts;
     #mixer;
 
-    constructor(options) {
+    constructor(opts) {
         super();
-        this.#options = options;
+        this.opts = opts;
+        console.error("constructor", this.options, this);
         //this.#mixerOAuthClient = new OAuthClient(options);
     }
 
     /** Attempts to perform a login */
     async mixerLogin() {
+        
 
+        let modal = this.#getShortCodeModal();
+        console.log("mixerLogin", this.options, this);
         if (!this.#mixerOAuthClient)
-        this.#mixerOAuthClient = new OAuthClient(this.#options);
+            this.#mixerOAuthClient = new OAuthClient(this.options.oAuth);
 
         const self = this;
-        let modal = this.#getShortCodeModal();
+        //let modal = this.#getShortCodeModal();
         modal.show();
 
         const attempt = async function() {
@@ -129,6 +133,8 @@ export class Mixy extends EventEmitter {
         return this.#shortCodeModal;
        
     }
+
+    get options() { return this.opts; }
 
     connect() {
         this.#mixer = new MixerClient();

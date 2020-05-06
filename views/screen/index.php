@@ -5,7 +5,7 @@ use kiss\Kiss;
 ?>
 
 <h2>Token URL:</h2>
-<input type="text" class="input is-secret" value="<?= Kiss::$app->baseURL() .  HTML::href([ 'player/'.  $config->jwt(Mixy::$app->getUser()) . '/'])?>"/>
+<input type="text" class="input is-secret" value="<?= $viewUrl ?>"/>
 
 <h2>Editor Form</h2>
 <form method="POST">
@@ -25,8 +25,8 @@ use kiss\Kiss;
                 disable_collapse: true,
                 compact: true,
                 object_layout: 'table',
-                value: <?= json_encode($config->getJson()); ?>,
-                default: <?= json_encode($screen->getJson()); ?>
+                value: <?= json_encode($configData); ?>,
+                default: <?= json_encode($defaultData); ?>
             });
         });
     });
