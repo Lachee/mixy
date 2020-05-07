@@ -35,7 +35,7 @@ class MixyController extends Controller {
             ],
         ];
 
-        $this->registerJsVariable("mixy", "new mixlib.Mixy(" . json_encode($mixyDefaults) . ")", Controller::POS_END, 'const', false);
+        $this->registerJsVariable("mixy", "new mixlib.Mixy(" . json_encode($mixyDefaults) . ")", Controller::POS_START, 'const', false);
         return parent::render($action, $options);
     }
 }

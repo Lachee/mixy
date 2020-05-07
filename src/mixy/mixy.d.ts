@@ -7,5 +7,5 @@ declare class Mixy {
     /** Shows the mixer login form. */
     mixerLogin() : Promise<boolean>
     
-    mixerInteractive() : object;
+    connect() : object;
 }

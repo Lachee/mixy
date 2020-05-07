@@ -31,7 +31,7 @@ $theme = HTTP::get('theme', 'lumen');
     <script src="https://cdn.jsdelivr.net/npm/@json-editor/json-editor@latest/dist/jsoneditor.min.js"></script>
 
     <!-- JS Variables -->
-    <?= $this->renderJsVariables(Controller::POS_START); ?>
+    <?= $this->renderJsVariables(Controller::POS_HEAD); ?>
 
     <!-- Webpacks -->
     <script src="/dist/kiss.js"></script>
@@ -43,4 +43,7 @@ $theme = HTTP::get('theme', 'lumen');
     <!-- App -->
     <script src="/dist/app.js"></script>
     <link rel="stylesheet" href="/dist/app.css">
+
+    <!-- JS Variables -->
+    <?= $this->renderJsVariables(Controller::POS_START); ?>
 </head>

@@ -78,6 +78,9 @@ class Configuration extends ActiveRecord {
      * @return string the JWT
      */
     public function jwt($user = null) {
+
+        assert($user != null, 'user isnt null');
+
         //Prepare the payload
         $payload = [
             'src'   => 'configuration',

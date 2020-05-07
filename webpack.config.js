@@ -117,17 +117,19 @@ const MonacoConfiguration = {
   },
 }
 
+/*
 const ServerConfiguration = {
   target: 'node',
   entry: './src/mixy-server/server.js',
   output: {
-    path: path.resolve(__dirname, './'),
-    filename: 'server.js'
+    path: path.resolve(__dirname, './build/'),
+    filename: 'index.js'
   },
   externals: [
     nodeExternals()
   ]
 };
+*/
 
 /*
 const TweenConfiguration = {
@@ -147,5 +149,5 @@ module.exports = [
     AppConfiguration,
     MixyConfiguration,
     MonacoConfiguration,
-    ServerConfiguration
+    //ServerConfiguration
 ].concat(require('./kiss/webpack.config'));

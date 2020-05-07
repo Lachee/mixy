@@ -15,7 +15,7 @@
             "request": "launch",
             "name": "Node",
             "skipFiles": [ "<node_internals>/**" ],
-            "program": "${workspaceFolder}\\src\\server\\index.js"
+            "program": "${workspaceFolder}\\src\\mixy-wss\\server.js"
         },
         {
             "name": "Launch currently open script",

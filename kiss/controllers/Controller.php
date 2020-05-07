@@ -14,8 +14,9 @@ use kiss\router\Route;
 
 class Controller extends Route {
 
-    public const POS_START = 0;
-    public const POS_END = 1;
+    public const POS_HEAD = 0;
+    public const POS_START = 1;
+    public const POS_END = 2;
     private $js = [];
 
     public static function getRouting() {

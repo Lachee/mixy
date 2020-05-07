@@ -32,7 +32,7 @@ class PlayerController extends MixyController {
             $screen = Screen::findByUuid($this->identifier)->one(); 
         } else {
             $jwt    = Kiss::$app->jwtProvider->decode($this->identifier);
-            $user   = User::findByJWT($jwt);
+            $user   = User::findByJWT($jwt)->one();
             if ($user == null) throw new HttpException(HTTP::FORBIDDEN, 'invalid JWT token');
 
             /** @var Configuration */

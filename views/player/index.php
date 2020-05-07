@@ -1,4 +1,6 @@
 <?php
+
+use kiss\controllers\Controller;
 use kiss\helpers\HTML;
 use kiss\Kiss;
 $theme = '';
@@ -12,6 +14,8 @@ $theme = '';
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         
+        <!-- JS Variables -->
+        <?= $this->renderJsVariables(Controller::POS_HEAD); ?>
         
         <!-- JQuery -->
         <script
@@ -56,6 +60,10 @@ $theme = '';
             }
             <?= $css ?>
         </style>
+
+        
+        <!-- JS Variables -->
+        <?= $this->renderJsVariables(Controller::POS_START); ?>
     </head>
     <body>
         <?= $html ?>
