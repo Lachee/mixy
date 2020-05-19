@@ -188,7 +188,7 @@ class HTTP {
         $csrf = Kiss::$app->jwtProvider->encode([
             
         ]);
-
+        assert(false, 'not fully implemented. Missing random component and validation of CSRF');
         return "<input type='hidden' value='$csrf' />";
     }
 
