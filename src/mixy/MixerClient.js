@@ -30,7 +30,11 @@ export class MixerClient extends EventEmitter {
         this.ws.addEventListener('open', (e) => { 
             console.log("Opened", e);
             this.send('HANDSHAKE', { 
-                'token': location.pathname.split('/')[2] 
+                'token': location.pathname.split('/')[2],
+                'components': [
+                    'Constellation',
+                    //'Interactive'
+                ]
             });
             this.emit('open', e); 
         });

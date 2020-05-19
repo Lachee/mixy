@@ -15,24 +15,8 @@ class MainController extends MixyController {
     public static function getRouting() { return "/main"; }
 
     function actionTest() {
-      
-        $val =  Kiss::$app->session->get('oauth', 'no potato');
-
-        $response = Mixy::$app->mixer->guzzle->request('GET', 'broadcasts/current', [ 
-            'headers'   => [
-                'content-type' => 'application/json',
-                'Authorization' => "Bearer {$val['accessToken']}",
-            ]
-        ]);
-        $json = json_decode($response->getBody()->getContents(), true);
-
 
         return Response::json(HTTP::OK, $json);
-        
-        return $this->render('index', [
-            'text' => Kiss::$app->session->getJWT(),
-            'value' => $val['accessToken']
-        ]);
     }
 
     function actionIndex() {
