@@ -183,11 +183,14 @@ class HTTP {
     /** @return bool if the doc has post. */
     public static function hasPost(){ return isset($_POST) && count($_POST) > 0; }
 
-    /** @return string the CSRF token in a tag */
+    /** @deprecated not yet implemented. 
+     * @return string the CSRF token in a tag */
     public static function CSRF() {
         $csrf = Kiss::$app->jwtProvider->encode([
             
         ]);
+
+        //TODO: Implement this
         assert(false, 'not fully implemented. Missing random component and validation of CSRF');
         return "<input type='hidden' value='$csrf' />";
     }
