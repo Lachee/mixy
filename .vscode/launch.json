@@ -9,13 +9,6 @@
             "type": "php",
             "request": "launch",
             "port": 9000
-        },        
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Node",
-            "skipFiles": [ "<node_internals>/**" ],
-            "program": "${workspaceFolder}\\src\\mixy-wss\\server.js"
         },
         {
             "name": "Launch currently open script",
